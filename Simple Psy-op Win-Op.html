@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinOptimizer Pro - System Cleaner & Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom-color: #3498db;
+            color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .cleanup-item, .bloatware-item, .startup-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .cleanup-item:hover, .bloatware-item:hover, .startup-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .item-description {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .item-size {
+            color: #e74c3c;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 25px;
+            height: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 25px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d1edff;
+            border: 1px solid #74b9ff;
+            color: #0984e3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .scanning {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 WinOptimizer Pro</h1>
+            <p>Advanced System Optimization & Cleanup Tool for Windows 11</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('disk-cleanup')">
+                🗂️ Disk Cleanup
+            </div>
+            <div class="tab" onclick="switchTab('bloatware')">
+                🗑️ Bloatware Removal
+            </div>
+            <div class="tab" onclick="switchTab('startup')">
+                ⚡ Startup Manager
+            </div>
+            <div class="tab" onclick="switchTab('system-info')">
+                📊 System Info
+            </div>
+        </div>
+
+        <!-- Disk Cleanup Tab -->
+        <div class="tab-content active" id="disk-cleanup">
+            <!-- Controls moved to top -->
+            <div class="controls" style="margin-bottom: 20px;">
+                <button class="btn" onclick="scanForFiles()">🔍 Scan System</button>
+                <button class="btn btn-success" onclick="selectAllCleanup()">✅ Select All</button>
+                <button class="btn" onclick="deselectAllCleanup()">❌ Deselect All</button>
+                <button class="btn btn-danger" onclick="cleanupSelected()">🧹 Clean Selected</button>
+            </div>
+
+            <!-- Log box moved to underneath buttons -->
+            <div class="log" id="cleanup-log" style="display: none; margin-bottom: 20px;"></div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-files">0</div>
+                    <div>Files Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-size">0 MB</div>
+                    <div>Total Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="selected-size">0 MB</div>
+                    <div>Selected for Cleanup</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
+                    Temporary Files & Cache
+                </h3>
+                <div id="temp-files"></div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,18L12,15.5L7,18V6H17V18Z"/></svg>
+                    System Files
+                </h3>
+                <div id="system-files"></div>
+            </div>
+
+            <div class="progress-container" style="display: none;" id="cleanup-progress-container">
+                <div class="progress-bar" id="cleanup-progress"></div>
+            </div>
+        </div>
+
+        <!-- Bloatware Removal Tab -->
+        <div class="tab-content" id="bloatware">
+            <div class="warning">
+                ⚠️ <strong>Warning:</strong> Removing system applications may affect Windows functionality. Only remove applications you're certain you don't need.
+            </div>
+
+            <!-- Controls moved to top -->
+            <div class="controls" style="margin-bottom: 20px;">
+                <button class="btn" onclick="scanBloatware()">🔍 Scan for Bloatware</button>
+                <button class="btn btn-success" onclick="selectAllBloatware()">✅ Select All</button>
+                <button class="btn" onclick="deselectAllBloatware()">❌ Deselect All</button>
+                <button class="btn" onclick="selectRecommendedBloatware()">🎯 Select Recommended</button>
+                <button class="btn btn-danger" onclick="removeBloatware()">🗑️ Remove Selected</button>
+            </div>
+
+            <!-- Log box moved to underneath buttons -->
+            <div class="log" id="bloatware-log" style="display: none; margin-bottom: 20px;"></div>
+
+            <!-- Enhanced statistics section -->
+            <div class="section" id="bloatware-stats" style="display: none;">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/></svg>
+                    Scan Results
+                </h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-apps">0</div>
+                        <div>Total Apps Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="bloatware-apps">0</div>
+                        <div>Potential Bloatware</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="selected-apps">0</div>
+                        <div>Selected for Removal</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="potential-space">0 MB</div>
+                        <div>Potential Space Freed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                    Pre-installed Apps & Store Apps
+                </h3>
+                <div id="preinstalled-apps"></div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1H5C3.89,1 3,1.89 3,3V7H9V9H21M7,10V12H5V10H7M13,10V12H11V10H13M19,10V12H17V10H19Z"/></svg>
+                    Third-party Software
+                </h3>
+                <div id="third-party-apps"></div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
+                    Browser Extensions & Add-ons
+                </h3>
+                <div id="browser-extensions"></div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M9,4V6H15V4H17V6H20A2,2 0 0,1 22,8V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V8A2,2 0 0,1 4,6H7V4H9M4,8V18H20V8H4Z"/></svg>
+                    Legacy/Outdated Software
+                </h3>
+                <div id="legacy-software"></div>
+            </div>
+
+
+        </div>
+
+        <!-- Startup Manager Tab -->
+        <div class="tab-content" id="startup">
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+                    Startup Programs
+                </h3>
+                <div id="startup-programs"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="scanStartupItems()">🔍 Scan Startup Items</button>
+                <button class="btn btn-success" onclick="applyStartupChanges()">✅ Apply Changes</button>
+            </div>
+
+            <!-- Log box moved to underneath buttons -->
+            <div class="log" id="startup-log" style="display: none; margin-bottom: 20px;"></div>
+        </div>
+
+        <!-- System Info Tab -->
+        <div class="tab-content" id="system-info">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="cpu-usage">0%</div>
+                    <div>CPU Usage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="memory-usage">0%</div>
+                    <div>Memory Usage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="disk-usage">0%</div>
+                    <div>Disk Usage</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"/></svg>
+                    System Information
+                </h3>
+                <div id="system-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for state management
+        let cleanupData = {};
+        let bloatwareData = {};
+        let startupData = {};
+        let systemInfo = {};
+        let removedApps = new Set(); // Track removed apps to prevent reappearing
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Disk Cleanup Functions
+        async function scanForFiles() {
+            const btn = event.target;
+            btn.classList.add('scanning');
+            btn.textContent = '🔄 Scanning...';
+            btn.disabled = true;
+
+            try {
+                // Use real system scanning instead of fake data
+                if (window.electronAPI && window.electronAPI.scanTempFiles) {
+                    const realTempFiles = await window.electronAPI.scanTempFiles();
+                    console.log('Real temp files found:', realTempFiles);
+                    
+                    // Convert real files to our format
+                    cleanupData = {
+                        tempFiles: realTempFiles.map(file => ({
+                            name: file.name,
+                            path: file.path,
+                            size: Math.max(Math.round(file.size / (1024 * 1024)), 1), // Convert to MB, minimum 1 MB
+                            description: `File: ${file.path}`,
+                            realPath: file.path // Keep real path for deletion
+                        })),
+                        systemFiles: []
+                    };
+                    
+                    displayCleanupFiles();
+                    updateCleanupStats();
+                } else {
+                    console.warn('Electron API not available, using mock data');
+                    generateCleanupData();
+                    displayCleanupFiles();
+                    updateCleanupStats();
+                }
+            } catch (error) {
+                console.error('Error scanning files:', error);
+                alert('Error scanning files: ' + error.message);
+                // Fallback to mock data
+                generateCleanupData();
+                displayCleanupFiles();
+                updateCleanupStats();
+            }
+            
+            btn.classList.remove('scanning');
+            btn.textContent = '🔍 Scan System';
+            btn.disabled = false;
+        }
+
+        function generateCleanupData() {
+            cleanupData = {
+                tempFiles: [
+                    { name: 'Windows Temp Files', path: 'C:\\Windows\\Temp\\*', size: 245, description: 'Temporary files created by Windows' },
+                    { name: 'User Temp Files', path: '%TEMP%\\*', size: 156, description: 'Temporary files in user directory' },
+                    { name: 'Browser Cache', path: 'Browser cache files', size: 89, description: 'Cached web content from browsers' },
+                    { name: 'Windows Update Cache', path: 'C:\\Windows\\SoftwareDistribution\\Download\\*', size: 312, description: 'Downloaded Windows updates' }
+                ],
+                systemFiles: [
+                    { name: 'Recycle Bin', path: '$Recycle.Bin', size: 78, description: 'Files in recycle bin' },
+                    { name: 'System Error Reports', path: 'C:\\ProgramData\\Microsoft\\Windows\\WER\\*', size: 23, description: 'Windows error reporting files' },
+                    { name: 'Delivery Optimization Files', path: 'C:\\Windows\\ServiceProfiles\\NetworkService\\AppData\\Local\\Microsoft\\Windows\\DeliveryOptimization\\*', size: 134, description: 'Windows Update delivery optimization cache' },
+                    { name: 'Thumbnail Cache', path: '%LOCALAPPDATA%\\Microsoft\\Windows\\Explorer\\*', size: 45, description: 'Cached thumbnails for files and folders' }
+                ]
+            };
+        }
+
+        function displayCleanupFiles() {
+            const tempFilesContainer = document.getElementById('temp-files');
+            const systemFilesContainer = document.getElementById('system-files');
+
+            tempFilesContainer.innerHTML = '';
+            systemFilesContainer.innerHTML = '';
+
+            cleanupData.tempFiles.forEach((file, index) => {
+                const item = createCleanupItem(file, 'temp', index);
+                tempFilesContainer.appendChild(item);
+            });
+
+            cleanupData.systemFiles.forEach((file, index) => {
+                const item = createCleanupItem(file, 'system', index);
+                systemFilesContainer.appendChild(item);
+            });
+        }
+
+        function createCleanupItem(file, type, index) {
+            const item = document.createElement('div');
+            item.className = 'cleanup-item';
+            item.innerHTML = `
+                <div class="item-info">
+                    <div class="item-name">${file.name}</div>
+                    <div class="item-description">${file.description}</div>
+                </div>
+                <div class="item-size">${file.size} MB</div>
+                <input type="checkbox" class="checkbox" onchange="updateCleanupStats()" data-type="${type}" data-index="${index}" data-size="${file.size}">
+            `;
+            return item;
+        }
+
+        function updateCleanupStats() {
+            const checkboxes = document.querySelectorAll('#disk-cleanup .checkbox');
+            let totalFiles = cleanupData.tempFiles.length + cleanupData.systemFiles.length;
+            let totalSize = [...cleanupData.tempFiles, ...cleanupData.systemFiles].reduce((sum, file) => sum + file.size, 0);
+            let selectedSize = 0;
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedSize += parseInt(checkbox.dataset.size);
+                }
+            });
+
+            document.getElementById('total-files').textContent = totalFiles;
+            document.getElementById('total-size').textContent = totalSize + ' MB';
+            document.getElementById('selected-size').textContent = selectedSize + ' MB';
+        }
+
+        function selectAllCleanup() {
+            document.querySelectorAll('#disk-cleanup .checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateCleanupStats();
+        }
+
+        function deselectAllCleanup() {
+            document.querySelectorAll('#disk-cleanup .checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateCleanupStats();
+        }
+
+        async function cleanupSelected() {
+            const selectedItems = document.querySelectorAll('#disk-cleanup .checkbox:checked');
+            if (selectedItems.length === 0) {
+                alert('Please select items to clean up.');
+                return;
+            }
+
+            // Confirm deletion
+            const confirmed = confirm(`Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`);
+            if (!confirmed) return;
+
+            const progressContainer = document.getElementById('cleanup-progress-container');
+            const progressBar = document.getElementById('cleanup-progress');
+            const log = document.getElementById('cleanup-log');
+
+            progressContainer.style.display = 'block';
+            log.style.display = 'block';
+            log.innerHTML = '';
+
+            // Collect file paths for real deletion
+            const filePaths = [];
+            selectedItems.forEach(item => {
+                const cleanupItem = item.closest('.cleanup-item');
+                const fileName = cleanupItem.querySelector('.item-name').textContent;
+                const index = parseInt(item.dataset.index);
+                const type = item.dataset.type;
+                
+                // Get the real file path
+                if (type === 'temp' && cleanupData.tempFiles[index] && cleanupData.tempFiles[index].realPath) {
+                    filePaths.push(cleanupData.tempFiles[index].realPath);
+                } else if (type === 'system' && cleanupData.systemFiles[index] && cleanupData.systemFiles[index].realPath) {
+                    filePaths.push(cleanupData.systemFiles[index].realPath);
+                }
+            });
+
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Starting cleanup of ${filePaths.length} files...\n`;
+
+            try {
+                // Use real file deletion instead of fake cleanup
+                if (window.electronAPI && window.electronAPI.cleanupFiles && filePaths.length > 0) {
+                    log.innerHTML += `[${new Date().toLocaleTimeString()}] Calling real file deletion...\n`;
+                    log.scrollTop = log.scrollHeight;
+                    
+                    const result = await window.electronAPI.cleanupFiles(filePaths);
+                    
+                    if (result.success) {
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Successfully deleted ${result.deletedCount} files\n`;
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Freed up ${Math.round(result.totalSize / (1024 * 1024))} MB\n`;
+                        
+                        if (result.errors && result.errors.length > 0) {
+                            log.innerHTML += `[${new Date().toLocaleTimeString()}] Errors: ${result.errors.length} files could not be deleted\n`;
+                            result.errors.forEach(error => {
+                                log.innerHTML += `[${new Date().toLocaleTimeString()}] Error: ${error.file} - ${error.error}\n`;
+                            });
+                        }
+                        
+                        // Remove successfully deleted items from display
+                        selectedItems.forEach(item => {
+                            item.closest('.cleanup-item').remove();
+                        });
+                        
+                        progressBar.style.width = '100%';
+                        
+                        // Show success message
+                        const successDiv = document.createElement('div');
+                        successDiv.className = 'success';
+                        successDiv.innerHTML = `✅ Successfully cleaned ${result.deletedCount} items and freed up ${Math.round(result.totalSize / (1024 * 1024))} MB!`;
+                        document.getElementById('disk-cleanup').insertBefore(successDiv, document.getElementById('disk-cleanup').firstChild);
+                        
+                        setTimeout(() => successDiv.remove(), 5000);
+                        
+                    } else {
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Cleanup failed: ${result.error || 'Unknown error'}\n`;
+                        alert('Cleanup failed: ' + (result.error || 'Unknown error'));
+                    }
+                } else {
+                    log.innerHTML += `[${new Date().toLocaleTimeString()}] Warning: Using simulated cleanup (Electron API not available)\n`;
+                    
+                    // Fallback to visual cleanup for testing
+                    let progress = 0;
+                    const increment = 100 / selectedItems.length;
+
+                    for (let index = 0; index < selectedItems.length; index++) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        const item = selectedItems[index];
+                        const fileName = item.closest('.cleanup-item').querySelector('.item-name').textContent;
+                        const size = item.dataset.size;
+                        
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Simulated cleanup: ${fileName} (${size} MB)\n`;
+                        log.scrollTop = log.scrollHeight;
+                        
+                        progress += increment;
+                        progressBar.style.width = progress + '%';
+                        
+                        item.closest('.cleanup-item').remove();
+                    }
+                    
+                    log.innerHTML += `[${new Date().toLocaleTimeString()}] Simulated cleanup completed!\n`;
+                }
+            } catch (error) {
+                console.error('Error during cleanup:', error);
+                log.innerHTML += `[${new Date().toLocaleTimeString()}] Error during cleanup: ${error.message}\n`;
+                alert('Error during cleanup: ' + error.message);
+            }
+            
+            updateCleanupStats();
+        }
+
+        // Enhanced Bloatware Removal Functions
+        async function scanBloatware() {
+            const btn = event.target;
+            btn.classList.add('scanning');
+            btn.textContent = '🔄 Scanning...';
+            btn.disabled = true;
+
+            try {
+                // Use real system scanning if available
+                if (window.electronAPI && window.electronAPI.getInstalledPrograms) {
+                    const installedPrograms = await window.electronAPI.getInstalledPrograms();
+                    console.log('Real installed programs found:', installedPrograms);
+                    
+                    // Filter out already removed apps
+                    const filteredPrograms = installedPrograms.filter(app => !removedApps.has(app.name));
+                    
+                    // Enhanced categorization with better bloatware detection
+                    bloatwareData = {
+                        preinstalled: categorizePreinstalledApps(filteredPrograms),
+                        thirdParty: categorizeThirdPartyApps(filteredPrograms),
+                        browserExtensions: categorizeBrowserExtensions(),
+                        legacySoftware: categorizeLegacySoftware(filteredPrograms)
+                    };
+                } else {
+                    console.warn('Electron API not available, using enhanced fallback data');
+                    generateEnhancedBloatwareData();
+                }
+                
+                displayBloatwareApps();
+                updateBloatwareStats();
+                document.getElementById('bloatware-stats').style.display = 'block';
+            } catch (error) {
+                console.error('Error scanning for bloatware:', error);
+                alert('Error scanning for bloatware: ' + error.message);
+                // Fallback to mock data
+                generateEnhancedBloatwareData();
+                displayBloatwareApps();
+                updateBloatwareStats();
+                document.getElementById('bloatware-stats').style.display = 'block';
+            }
+            
+            btn.classList.remove('scanning');
+            btn.textContent = '🔍 Scan for Bloatware';
+            btn.disabled = false;
+        }
+
+        // Helper function to format app sizes
+        function formatAppSize(size) {
+            if (!size || size === 'Unknown' || isNaN(size)) {
+                return 'Unknown';
+            }
+            
+            const sizeNum = parseInt(size);
+            if (sizeNum === 0) {
+                return '< 1 MB';
+            } else if (sizeNum < 1024) {
+                return `${sizeNum} MB`;
+            } else {
+                return `${(sizeNum / 1024).toFixed(1)} GB`;
+            }
+        }
+
+        function categorizePreinstalledApps(programs) {
+            const knownBloatware = [
+                'candy crush', 'disney magic', 'netflix', 'spotify', 'twitter',
+                'instagram', 'facebook', 'tiktok', 'xbox game bar', 'mixed reality',
+                'your phone', 'cortana', 'groove music', 'movies & tv', 'skype',
+                'solitaire', 'bubble witch', 'march of empires', 'hidden city',
+                'farmville', 'minecraft', 'roblox', 'asphalt', 'flipboard'
+            ];
+
+            const systemApps = [
+                'windows security', 'windows defender', 'edge', 'notepad', 'calculator',
+                'camera', 'mail', 'calendar', 'weather', 'maps', 'photos', 'clock',
+                'sticky notes', 'snipping tool', 'paint', 'wordpad'
+            ];
+
+            return programs.filter(app => {
+                const name = app.name.toLowerCase();
+                const publisher = (app.publisher || '').toLowerCase();
+                return publisher.includes('microsoft') || name.includes('microsoft');
+            }).map(app => {
+                const name = app.name.toLowerCase();
+                const isBloatware = knownBloatware.some(bloat => name.includes(bloat));
+                const isSystem = systemApps.some(sys => name.includes(sys));
+                
+                let risk = 'Medium';
+                let recommendation = 'Review';
+                
+                if (isBloatware) {
+                    risk = 'Safe';
+                    recommendation = 'Remove';
+                } else if (isSystem) {
+                    risk = 'High';
+                    recommendation = 'Keep';
+                }
+                
+                return {
+                    name: app.name,
+                    publisher: app.publisher || 'Microsoft',
+                    size: formatAppSize(app.size),
+                    risk: risk,
+                    recommendation: recommendation,
+                    description: `${isBloatware ? 'Bloatware' : isSystem ? 'System app' : 'Microsoft app'}: ${app.name}`,
+                    realName: app.name,
+                    category: isBloatware ? 'bloatware' : isSystem ? 'system' : 'microsoft'
+                };
+            });
+        }
+
+        function categorizeThirdPartyApps(programs) {
+            const potentialBloatware = [
+                'mcafee', 'norton', 'avast', 'avg', 'ccleaner', 'driver booster',
+                'advanced systemcare', 'pc cleaner', 'registry cleaner', 'toolbar',
+                'search protect', 'browser hijacker', 'adware', 'trial', 'demo'
+            ];
+
+            const outdatedSoftware = [
+                'flash player', 'java 8', 'silverlight', 'quicktime', 'realplayer',
+                'adobe reader', 'windows media player', 'internet explorer'
+            ];
+
+            return programs.filter(app => {
+                const publisher = (app.publisher || '').toLowerCase();
+                return !publisher.includes('microsoft');
+            }).map(app => {
+                const name = app.name.toLowerCase();
+                const publisher = (app.publisher || '').toLowerCase();
+                
+                const isPotentialBloatware = potentialBloatware.some(bloat => 
+                    name.includes(bloat) || publisher.includes(bloat)
+                );
+                const isOutdated = outdatedSoftware.some(old => name.includes(old));
+                
+                let risk = 'Medium';
+                let recommendation = 'Review';
+                
+                if (isPotentialBloatware) {
+                    risk = 'Safe';
+                    recommendation = 'Remove';
+                } else if (isOutdated) {
+                    risk = 'High';
+                    recommendation = 'Update or Remove';
+                }
+                
+                return {
+                    name: app.name,
+                    publisher: app.publisher || 'Unknown',
+                    size: formatAppSize(app.size),
+                    risk: risk,
+                    recommendation: recommendation,
+                    description: `${isPotentialBloatware ? 'Potential bloatware' : isOutdated ? 'Outdated software' : 'Third-party software'}: ${app.name}`,
+                    realName: app.name,
+                    category: isPotentialBloatware ? 'bloatware' : isOutdated ? 'outdated' : 'thirdparty'
+                };
+            });
+        }
+
+        function categorizeBrowserExtensions() {
+            // Placeholder for browser extension detection
+            // In a real implementation, this would scan browser directories
+            return [
+                {
+                    name: 'Unknown Browser Toolbar',
+                    publisher: 'Unknown',
+                    size: '5 MB',
+                    risk: 'Medium',
+                    recommendation: 'Review',
+                    description: 'Browser extension or toolbar (scan browser for details)',
+                    realName: 'browser_extension_placeholder',
+                    category: 'extension'
+                }
+            ];
+        }
+
+        function categorizeLegacySoftware(programs) {
+            const legacyIndicators = [
+                '2019', '2018', '2017', '2016', '2015', 'legacy', 'old version',
+                'unsupported', 'deprecated', 'obsolete'
+            ];
+
+            return programs.filter(app => {
+                const name = app.name.toLowerCase();
+                return legacyIndicators.some(indicator => name.includes(indicator));
+            }).map(app => ({
+                name: app.name,
+                publisher: app.publisher || 'Unknown',
+                size: app.size || 'Unknown',
+                risk: 'High',
+                recommendation: 'Update or Remove',
+                description: `Legacy/outdated software: ${app.name}`,
+                realName: app.name,
+                category: 'legacy'
+            }));
+        }
+
+        function generateEnhancedBloatwareData() {
+            bloatwareData = {
+                preinstalled: [
+                    { name: 'Candy Crush Saga', publisher: 'King', size: 89, risk: 'Safe', recommendation: 'Remove', description: 'Bloatware: Mobile game pre-installed with Windows', category: 'bloatware' },
+                    { name: 'Xbox Game Bar', publisher: 'Microsoft', size: 45, risk: 'Medium', recommendation: 'Review', description: 'Microsoft app: Gaming overlay and recording tool', category: 'microsoft' },
+                    { name: 'Microsoft Solitaire Collection', publisher: 'Microsoft', size: 67, risk: 'Safe', recommendation: 'Remove', description: 'Bloatware: Card games collection', category: 'bloatware' },
+                    { name: 'Disney Magic Kingdoms', publisher: 'Gameloft', size: 123, risk: 'Safe', recommendation: 'Remove', description: 'Bloatware: Mobile game from Microsoft Store', category: 'bloatware' },
+                    { name: 'Microsoft People', publisher: 'Microsoft', size: 23, risk: 'Medium', recommendation: 'Review', description: 'Microsoft app: Contacts management app', category: 'microsoft' },
+                    { name: 'Your Phone', publisher: 'Microsoft', size: 34, risk: 'Safe', recommendation: 'Remove', description: 'Bloatware: Phone integration app', category: 'bloatware' },
+                    { name: 'Mixed Reality Portal', publisher: 'Microsoft', size: 156, risk: 'Safe', recommendation: 'Remove', description: 'Bloatware: VR/AR portal (rarely used)', category: 'bloatware' }
+                ].map(app => ({ ...app, size: formatAppSize(app.size) })),
+                thirdParty: [
+                    { name: 'McAfee WebAdvisor', publisher: 'McAfee', size: 156, risk: 'Safe', recommendation: 'Remove', description: 'Potential bloatware: Browser security extension (trial)', category: 'bloatware' },
+                    { name: 'Adobe Flash Player (Legacy)', publisher: 'Adobe', size: 34, risk: 'High', recommendation: 'Update or Remove', description: 'Outdated software: Outdated and potentially vulnerable', category: 'outdated' },
+                    { name: 'Java 8 Update 171', publisher: 'Oracle', size: 98, risk: 'High', recommendation: 'Update or Remove', description: 'Outdated software: Outdated Java runtime', category: 'outdated' },
+                    { name: 'WinRAR (Trial)', publisher: 'win.rar GmbH', size: 45, risk: 'Medium', recommendation: 'Review', description: 'Third-party software: Archive utility in trial mode', category: 'thirdparty' },
+                    { name: 'CCleaner Free', publisher: 'Piriform', size: 67, risk: 'Safe', recommendation: 'Remove', description: 'Potential bloatware: System cleaner (potentially unwanted)', category: 'bloatware' },
+                    { name: 'Advanced SystemCare', publisher: 'IObit', size: 234, risk: 'Safe', recommendation: 'Remove', description: 'Potential bloatware: System optimization tool', category: 'bloatware' }
+                ].map(app => ({ ...app, size: formatAppSize(app.size) })),
+                browserExtensions: [
+                    { name: 'Search Protect Toolbar', publisher: 'Unknown', size: 12, risk: 'Safe', recommendation: 'Remove', description: 'Browser extension or toolbar (potential adware)', category: 'extension' },
+                    { name: 'Shopping Assistant', publisher: 'Various', size: 8, risk: 'Medium', recommendation: 'Review', description: 'Browser extension (may track browsing)', category: 'extension' }
+                ].map(app => ({ ...app, size: formatAppSize(app.size) })),
+                legacySoftware: [
+                    { name: 'Internet Explorer 11', publisher: 'Microsoft', size: 45, risk: 'High', recommendation: 'Update or Remove', description: 'Legacy/outdated software: Deprecated browser', category: 'legacy' },
+                    { name: 'Windows Media Player Legacy', publisher: 'Microsoft', size: 23, risk: 'High', recommendation: 'Update or Remove', description: 'Legacy/outdated software: Superseded by newer apps', category: 'legacy' }
+                ].map(app => ({ ...app, size: formatAppSize(app.size) }))
+            };
+        }
+
+        function displayBloatwareApps() {
+            const preinstalledContainer = document.getElementById('preinstalled-apps');
+            const thirdPartyContainer = document.getElementById('third-party-apps');
+            const browserContainer = document.getElementById('browser-extensions');
+            const legacyContainer = document.getElementById('legacy-software');
+
+            preinstalledContainer.innerHTML = '';
+            thirdPartyContainer.innerHTML = '';
+            browserContainer.innerHTML = '';
+            legacyContainer.innerHTML = '';
+
+            bloatwareData.preinstalled.forEach((app, index) => {
+                const item = createBloatwareItem(app, 'preinstalled', index);
+                preinstalledContainer.appendChild(item);
+            });
+
+            bloatwareData.thirdParty.forEach((app, index) => {
+                const item = createBloatwareItem(app, 'thirdparty', index);
+                thirdPartyContainer.appendChild(item);
+            });
+
+            if (bloatwareData.browserExtensions) {
+                bloatwareData.browserExtensions.forEach((app, index) => {
+                    const item = createBloatwareItem(app, 'browser', index);
+                    browserContainer.appendChild(item);
+                });
+            }
+
+            if (bloatwareData.legacySoftware) {
+                bloatwareData.legacySoftware.forEach((app, index) => {
+                    const item = createBloatwareItem(app, 'legacy', index);
+                    legacyContainer.appendChild(item);
+                });
+            }
+        }
+
+        function createBloatwareItem(app, type, index) {
+            const riskColor = app.risk === 'High' ? '#e74c3c' : app.risk === 'Medium' ? '#f39c12' : '#27ae60';
+            const recommendationColor = app.recommendation === 'Remove' ? '#e74c3c' : app.recommendation === 'Review' ? '#f39c12' : '#27ae60';
+            const item = document.createElement('div');
+            item.className = 'bloatware-item';
+            item.innerHTML = `
+                <div class="item-info">
+                    <div class="item-name">${app.name}</div>
+                    <div class="item-description">${app.description} | Publisher: ${app.publisher} | Size: ${app.size} | <span style="color: ${riskColor}; font-weight: bold;">Risk: ${app.risk}</span> | <span style="color: ${recommendationColor}; font-weight: bold;">Recommendation: ${app.recommendation}</span></div>
+                </div>
+                <input type="checkbox" class="checkbox" data-type="${type}" data-index="${index}" data-size="${app.size}" data-recommendation="${app.recommendation}" onchange="updateBloatwareStats()">
+            `;
+            return item;
+        }
+
+        // New button functions for bloatware management
+        function selectAllBloatware() {
+            document.querySelectorAll('#bloatware .checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateBloatwareStats();
+        }
+
+        function deselectAllBloatware() {
+            document.querySelectorAll('#bloatware .checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateBloatwareStats();
+        }
+
+        function selectRecommendedBloatware() {
+            document.querySelectorAll('#bloatware .checkbox').forEach(checkbox => {
+                const recommendation = checkbox.dataset.recommendation;
+                checkbox.checked = recommendation === 'Remove';
+            });
+            updateBloatwareStats();
+        }
+
+        function updateBloatwareStats() {
+            const checkboxes = document.querySelectorAll('#bloatware .checkbox');
+            let totalApps = 0;
+            let bloatwareApps = 0;
+            let selectedApps = 0;
+            let potentialSpace = 0;
+
+            // Count total apps
+            if (bloatwareData.preinstalled) totalApps += bloatwareData.preinstalled.length;
+            if (bloatwareData.thirdParty) totalApps += bloatwareData.thirdParty.length;
+            if (bloatwareData.browserExtensions) totalApps += bloatwareData.browserExtensions.length;
+            if (bloatwareData.legacySoftware) totalApps += bloatwareData.legacySoftware.length;
+
+            // Count bloatware apps (apps with "Remove" recommendation)
+            const allApps = [
+                ...(bloatwareData.preinstalled || []),
+                ...(bloatwareData.thirdParty || []),
+                ...(bloatwareData.browserExtensions || []),
+                ...(bloatwareData.legacySoftware || [])
+            ];
+            bloatwareApps = allApps.filter(app => app.recommendation === 'Remove').length;
+
+                         // Count selected apps and potential space
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedApps++;
+                    const sizeStr = checkbox.dataset.size || '0';
+                    // Handle both "123 MB" and "123" formats
+                    const sizeMatch = sizeStr.match(/(\d+(?:\.\d+)?)/);
+                    if (sizeMatch) {
+                        const sizeValue = parseFloat(sizeMatch[1]);
+                        // If it contains "GB", convert to MB
+                        if (sizeStr.includes('GB')) {
+                            potentialSpace += Math.round(sizeValue * 1024);
+                        } else {
+                            potentialSpace += Math.round(sizeValue);
+                        }
+                    }
+                }
+            });
+
+            // Update UI
+            if (document.getElementById('total-apps')) {
+                document.getElementById('total-apps').textContent = totalApps;
+                document.getElementById('bloatware-apps').textContent = bloatwareApps;
+                document.getElementById('selected-apps').textContent = selectedApps;
+                document.getElementById('potential-space').textContent = potentialSpace + ' MB';
+            }
+        }
+
+        async function removeBloatware() {
+            const selectedItems = document.querySelectorAll('#bloatware .checkbox:checked');
+            if (selectedItems.length === 0) {
+                alert('Please select applications to remove.');
+                return;
+            }
+
+            // Confirm removal with detailed warning
+            const appNames = Array.from(selectedItems).map(item => 
+                item.closest('.bloatware-item').querySelector('.item-name').textContent
+            );
+            const confirmed = confirm(`Are you sure you want to remove ${selectedItems.length} selected applications?\n\nApplications to remove:\n${appNames.join('\n')}\n\nThis action cannot be undone.`);
+            if (!confirmed) return;
+
+            const log = document.getElementById('bloatware-log');
+            log.style.display = 'block';
+            log.innerHTML = '';
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < selectedItems.length; i++) {
+                const item = selectedItems[i];
+                const appName = item.closest('.bloatware-item').querySelector('.item-name').textContent;
+                
+                log.innerHTML += `[${new Date().toLocaleTimeString()}] Removing: ${appName}\n`;
+                log.scrollTop = log.scrollHeight;
+                
+                try {
+                    // Use real uninstall if available
+                    if (window.electronAPI && window.electronAPI.uninstallProgram) {
+                        const result = await window.electronAPI.uninstallProgram(appName);
+                        
+                        if (result.success) {
+                            log.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ ${appName} successfully removed\n\n`;
+                            // Add to removed apps set to prevent reappearing
+                            removedApps.add(appName);
+                            item.closest('.bloatware-item').remove();
+                            successCount++;
+                        } else {
+                            log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Failed to remove ${appName}: ${result.error}\n\n`;
+                            errorCount++;
+                        }
+                    } else {
+                        // Fallback to simulated removal
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Uninstalling application...\n`;
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Cleaning registry entries...\n`;
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ${appName} successfully removed (simulated)\n\n`;
+                        // Add to removed apps set to prevent reappearing
+                        removedApps.add(appName);
+                        item.closest('.bloatware-item').remove();
+                        successCount++;
+                    }
+                } catch (error) {
+                    log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Error removing ${appName}: ${error.message}\n\n`;
+                    errorCount++;
+                }
+                
+                log.scrollTop = log.scrollHeight;
+                
+                // Add delay between uninstalls
+                if (i < selectedItems.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Bloatware removal completed!\n`;
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Successfully removed: ${successCount} applications\n`;
+            if (errorCount > 0) {
+                log.innerHTML += `[${new Date().toLocaleTimeString()}] Failed to remove: ${errorCount} applications\n`;
+            }
+            
+            // Update statistics after removal
+            updateBloatwareStats();
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = successCount > 0 ? 'success' : 'warning';
+            successDiv.innerHTML = successCount > 0 
+                ? `✅ Successfully removed ${successCount} applications! They will not appear in future scans.`
+                : `⚠️ No applications were successfully removed.`;
+            document.getElementById('bloatware').insertBefore(successDiv, document.getElementById('bloatware').firstChild);
+            
+            setTimeout(() => successDiv.remove(), 5000);
+        }
+
+        // Startup Manager Functions
+        async function scanStartupItems() {
+            const btn = event.target;
+            btn.classList.add('scanning');
+            btn.textContent = '🔄 Scanning...';
+            btn.disabled = true;
+
+            try {
+                // Use real startup items scanning if available
+                if (window.electronAPI && window.electronAPI.getStartupItems) {
+                    const realStartupItems = await window.electronAPI.getStartupItems();
+                    console.log('Real startup items found:', realStartupItems);
+                    
+                    // Convert real startup items to our format
+                    startupData = {
+                        items: realStartupItems.map(item => ({
+                            name: item.name || 'Unknown',
+                            publisher: item.publisher || 'Unknown Publisher',
+                            impact: item.impact || 'Medium',
+                            status: item.enabled ? 'Enabled' : 'Disabled',
+                            description: item.description || `Startup program: ${item.name}`,
+                            recommended: item.recommended || 'Disable',
+                            command: item.command,
+                            location: item.location,
+                            realName: item.name // Keep real name for enable/disable
+                        }))
+                    };
+                } else {
+                    console.warn('Electron API not available, using fallback data');
+                    generateStartupData();
+                }
+                
+                displayStartupItems();
+            } catch (error) {
+                console.error('Error scanning startup items:', error);
+                alert('Error scanning startup items: ' + error.message);
+                // Fallback to mock data
+                generateStartupData();
+                displayStartupItems();
+            }
+            
+            btn.classList.remove('scanning');
+            btn.textContent = '🔍 Scan Startup Items';
+            btn.disabled = false;
+        }
+
+        function generateStartupData() {
+            startupData = {
+                items: [
+                    { name: 'Steam', publisher: 'Valve Corporation', impact: 'High', status: 'Enabled', description: 'Gaming platform client', recommended: 'Disable' },
+                    { name: 'Spotify', publisher: 'Spotify AB', impact: 'Medium', status: 'Enabled', description: 'Music streaming application', recommended: 'Disable' },
+                    { name: 'Adobe Updater', publisher: 'Adobe Inc.', impact: 'Low', status: 'Enabled', description: 'Adobe software updater service', recommended: 'Disable' },
+                    { name: 'Windows Security', publisher: 'Microsoft Corporation', impact: 'Low', status: 'Enabled', description: 'Windows Defender antivirus', recommended: 'Keep' },
+                    { name: 'NVIDIA GeForce Experience', publisher: 'NVIDIA Corporation', impact: 'Medium', status: 'Enabled', description: 'Graphics driver management tool', recommended: 'Keep' },
+                    { name: 'Skype', publisher: 'Microsoft Corporation', impact: 'High', status: 'Enabled', description: 'Video calling application', recommended: 'Disable' },
+                    { name: 'Java Update Scheduler', publisher: 'Oracle Corporation', impact: 'Low', status: 'Enabled', description: 'Java runtime updater', recommended: 'Disable' },
+                    { name: 'Microsoft Office Click-to-Run', publisher: 'Microsoft Corporation', impact: 'Medium', status: 'Enabled', description: 'Office applications service', recommended: 'Keep' },
+                    { name: 'Discord', publisher: 'Discord Inc.', impact: 'Medium', status: 'Enabled', description: 'Voice and text chat application', recommended: 'Disable' },
+                    { name: 'CCleaner', publisher: 'Piriform Ltd', impact: 'Low', status: 'Enabled', description: 'System cleaning utility', recommended: 'Disable' }
+                ]
+            };
+        }
+
+        function displayStartupItems() {
+            const container = document.getElementById('startup-programs');
+            container.innerHTML = '';
+
+            startupData.items.forEach((item, index) => {
+                const startupItem = createStartupItem(item, index);
+                container.appendChild(startupItem);
+            });
+        }
+
+        function createStartupItem(item, index) {
+            const impactColor = item.impact === 'High' ? '#e74c3c' : item.impact === 'Medium' ? '#f39c12' : '#27ae60';
+            const recommendationColor = item.recommended === 'Keep' ? '#27ae60' : '#e74c3c';
+            const statusColor = item.status === 'Enabled' ? '#27ae60' : '#95a5a6';
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'startup-item';
+            itemDiv.innerHTML = `
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-description">
+                        ${item.description} | Publisher: ${item.publisher} | 
+                        <span style="color: ${impactColor}; font-weight: bold;">Impact: ${item.impact}</span> | 
+                        <span style="color: ${statusColor}; font-weight: bold;">Status: ${item.status}</span> | 
+                        <span style="color: ${recommendationColor}; font-weight: bold;">Recommended: ${item.recommended}</span>
+                    </div>
+                </div>
+                <select class="startup-select" data-index="${index}" onchange="updateStartupStatus(${index}, this.value)">
+                    <option value="Enabled" ${item.status === 'Enabled' ? 'selected' : ''}>Enable</option>
+                    <option value="Disabled" ${item.status === 'Disabled' ? 'selected' : ''}>Disable</option>
+                </select>
+            `;
+            return itemDiv;
+        }
+
+        function updateStartupStatus(index, newStatus) {
+            startupData.items[index].status = newStatus;
+        }
+
+        async function applyStartupChanges() {
+            const log = document.getElementById('startup-log');
+            log.style.display = 'block';
+            log.innerHTML = '';
+
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Applying startup configuration changes...\n`;
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < startupData.items.length; i++) {
+                const item = startupData.items[i];
+                const action = item.status === 'Enabled' ? 'Enabling' : 'Disabling';
+                
+                log.innerHTML += `[${new Date().toLocaleTimeString()}] ${action}: ${item.name}\n`;
+                log.scrollTop = log.scrollHeight;
+                
+                try {
+                    // Use real startup item toggling if available
+                    if (window.electronAPI && window.electronAPI.toggleStartupItem) {
+                        const result = await window.electronAPI.toggleStartupItem(item.realName || item.name, item.status === 'Enabled');
+                        
+                        if (result.success) {
+                            log.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ Registry key updated for ${item.name}\n`;
+                            successCount++;
+                        } else {
+                            log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Failed to update ${item.name}: ${result.error}\n`;
+                            errorCount++;
+                        }
+                    } else {
+                        // Fallback to simulated changes
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] Registry key updated for ${item.name} (simulated)\n`;
+                        successCount++;
+                    }
+                } catch (error) {
+                    log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Error updating ${item.name}: ${error.message}\n`;
+                    errorCount++;
+                }
+                
+                log.scrollTop = log.scrollHeight;
+                
+                // Add small delay between operations
+                if (i < startupData.items.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Startup configuration changes completed!\n`;
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Successfully updated: ${successCount} items\n`;
+            if (errorCount > 0) {
+                log.innerHTML += `[${new Date().toLocaleTimeString()}] Failed to update: ${errorCount} items\n`;
+            }
+            log.innerHTML += `[${new Date().toLocaleTimeString()}] Changes will take effect after restart.\n`;
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = successCount > 0 ? 'success' : 'warning';
+            successDiv.innerHTML = successCount > 0 
+                ? `✅ Startup configuration updated! Please restart your computer for changes to take effect.`
+                : `⚠️ No startup items were successfully updated.`;
+            document.getElementById('startup').insertBefore(successDiv, document.getElementById('startup').firstChild);
+            
+            setTimeout(() => successDiv.remove(), 7000);
+        }
+
+        // System Information Functions
+        async function loadSystemInfo() {
+            try {
+                // Use real system information if available
+                if (window.electronAPI && window.electronAPI.getSystemInfo) {
+                    const realSystemInfo = await window.electronAPI.getSystemInfo();
+                    console.log('Real system info found:', realSystemInfo);
+                    
+                    systemInfo = {
+                        os: realSystemInfo.os || 'Windows 11 Pro (Build 22631.4037)',
+                        processor: realSystemInfo.processor || 'Intel Core i7-12700K @ 3.60GHz',
+                        memory: realSystemInfo.memory || '32.0 GB DDR4',
+                        graphics: realSystemInfo.graphics || 'NVIDIA GeForce RTX 4070',
+                        storage: realSystemInfo.storage || 'Samsung SSD 980 PRO 1TB',
+                        motherboard: realSystemInfo.motherboard || 'ASUS ROG STRIX Z690-E',
+                        uptime: realSystemInfo.uptime || '2 days, 14 hours, 32 minutes'
+                    };
+                } else {
+                    console.warn('Electron API not available, using fallback system info');
+                    // Fallback to mock data
+                    systemInfo = {
+                        os: 'Windows 11 Pro (Build 22631.4037)',
+                        processor: 'Intel Core i7-12700K @ 3.60GHz',
+                        memory: '32.0 GB DDR4',
+                        graphics: 'NVIDIA GeForce RTX 4070',
+                        storage: 'Samsung SSD 980 PRO 1TB',
+                        motherboard: 'ASUS ROG STRIX Z690-E',
+                        uptime: '2 days, 14 hours, 32 minutes'
+                    };
+                }
+            } catch (error) {
+                console.error('Error loading system info:', error);
+                // Fallback to mock data
+                systemInfo = {
+                    os: 'Windows 11 Pro (Build 22631.4037)',
+                    processor: 'Intel Core i7-12700K @ 3.60GHz',
+                    memory: '32.0 GB DDR4',
+                    graphics: 'NVIDIA GeForce RTX 4070',
+                    storage: 'Samsung SSD 980 PRO 1TB',
+                    motherboard: 'ASUS ROG STRIX Z690-E',
+                    uptime: '2 days, 14 hours, 32 minutes'
+                };
+            }
+
+            displaySystemInfo();
+            await updateSystemStats();
+        }
+
+        function displaySystemInfo() {
+            const container = document.getElementById('system-details');
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">💻 Operating System</h4>
+                        <p>${systemInfo.os}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">⚡ Processor</h4>
+                        <p>${systemInfo.processor}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">🧠 Memory</h4>
+                        <p>${systemInfo.memory}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">🎮 Graphics</h4>
+                        <p>${systemInfo.graphics}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">💾 Storage</h4>
+                        <p>${systemInfo.storage}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">🔧 Motherboard</h4>
+                        <p>${systemInfo.motherboard}</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin-bottom: 10px;">⏱️ System Uptime</h4>
+                        <p>${systemInfo.uptime}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function updateSystemStats() {
+            try {
+                // Use real system statistics if available
+                if (window.electronAPI && window.electronAPI.getSystemStats) {
+                    const realStats = await window.electronAPI.getSystemStats();
+                    console.log('Real system stats:', realStats);
+                    
+                    document.getElementById('cpu-usage').textContent = (realStats.cpuUsage || 15) + '%';
+                    document.getElementById('memory-usage').textContent = (realStats.memoryUsage || 45) + '%';
+                    document.getElementById('disk-usage').textContent = (realStats.diskUsage || 65) + '%';
+                } else {
+                    // Fallback to simulated data
+                    const cpuUsage = Math.floor(Math.random() * 30) + 10; // 10-40%
+                    const memoryUsage = Math.floor(Math.random() * 20) + 40; // 40-60%
+                    const diskUsage = Math.floor(Math.random() * 15) + 60; // 60-75%
+
+                    document.getElementById('cpu-usage').textContent = cpuUsage + '%';
+                    document.getElementById('memory-usage').textContent = memoryUsage + '%';
+                    document.getElementById('disk-usage').textContent = diskUsage + '%';
+                }
+            } catch (error) {
+                console.error('Error updating system stats:', error);
+                // Fallback to simulated data
+                const cpuUsage = Math.floor(Math.random() * 30) + 10; // 10-40%
+                const memoryUsage = Math.floor(Math.random() * 20) + 40; // 40-60%
+                const diskUsage = Math.floor(Math.random() * 15) + 60; // 60-75%
+
+                document.getElementById('cpu-usage').textContent = cpuUsage + '%';
+                document.getElementById('memory-usage').textContent = memoryUsage + '%';
+                document.getElementById('disk-usage').textContent = diskUsage + '%';
+            }
+        }
+
+        // Additional utility functions
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            notification.innerHTML = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.maxWidth = '400px';
+            notification.style.borderRadius = '10px';
+            notification.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Add CSS for startup select dropdown
+        const additionalCSS = `
+            .startup-select {
+                padding: 8px 12px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                background: white;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .startup-select:hover {
+                border-color: #3498db;
+            }
+
+            .startup-select:focus {
+                outline: none;
+                border-color: #3498db;
+                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            }
+
+            .info {
+                background: #d1ecf1;
+                border: 1px solid #bee5eb;
+                color: #0c5460;
+            }
+        `;
+
+        // Add the additional CSS to the page
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = additionalCSS;
+        document.head.appendChild(styleSheet);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemInfo();
+            
+            // Update system stats every 3 seconds
+            setInterval(updateSystemStats, 3000);
+            
+            // Auto-scan on first load
+            setTimeout(() => {
+                scanForFiles();
+            }, 1000);
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchTab('disk-cleanup');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchTab('bloatware');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchTab('startup');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        switchTab('system-info');
+                        break;
+                }
+            }
+        });
+
+        // Add tooltips for better user experience
+        function addTooltips() {
+            const tooltipElements = document.querySelectorAll('[data-tooltip]');
+            tooltipElements.forEach(element => {
+                element.addEventListener('mouseenter', function(e) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = e.target.getAttribute('data-tooltip');
+                    tooltip.style.cssText = `
+                        position: absolute;
+                        background: rgba(0,0,0,0.8);
+                        color: white;
+                        padding: 8px 12px;
+                        border-radius: 6px;
+                        font-size: 0.9em;
+                        z-index: 1000;
+                        pointer-events: none;
+                        white-space: nowrap;
+                    `;
+                    document.body.appendChild(tooltip);
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    tooltip.style.left = rect.left + 'px';
+                    tooltip.style.top = (rect.top - 40) + 'px';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    const tooltip = document.querySelector('.tooltip');
+                    if (tooltip) tooltip.remove();
+                });
+            });
+        }
+
+        // Performance monitoring
+        function monitorPerformance() {
+            if ('performance' in window) {
+                const navigation = performance.getEntriesByType('navigation')[0];
+                console.log(`Page load time: ${navigation.loadEventEnd - navigation.loadEventStart}ms`);
+            }
+        }
+
+        // Initialize performance monitoring
+        setTimeout(monitorPerformance, 2000);
+    </script>
+</body>
+</html>
+
+        
