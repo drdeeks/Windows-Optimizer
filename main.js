@@ -3,13 +3,66 @@ const path = require('path');
 const fs = require('fs');
 const { exec, spawn } = require('child_process');
 const log = require('electron-log');
+const crypto = require('crypto');
 
-// Configure logging
+// Configure logging with enhanced error tracking
 log.transports.file.level = 'debug';
 log.transports.console.level = 'debug';
 
+// Global error handler for uncaught exceptions
+process.on('uncaughtException', (error) => {
+    log.error('Uncaught Exception:', error);
+    dialog.showErrorBox('Critical Error', `An unexpected error occurred: ${error.message}\n\nPlease restart the application.`);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    log.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Keep a global reference of the window object
 let mainWindow;
+
+// Enhanced error handling wrapper
+function withErrorHandling(fn, errorMessage = 'Operation failed') {
+    return async (...args) => {
+        try {
+            return await fn(...args);
+        } catch (error) {
+            log.error(errorMessage, error);
+            throw new Error(`${errorMessage}: ${error.message}`);
+        }
+    };
+}
+
+// Enhanced system validation
+function validateSystemRequirements() {
+    return new Promise((resolve, reject) => {
+        const checks = [
+            { name: 'PowerShell', command: 'powershell -Command "Get-Host | Select-Object Version"' },
+            { name: 'Windows Registry', command: 'reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion"' },
+            { name: 'File System Access', command: 'dir %TEMP%' }
+        ];
+        
+        let completed = 0;
+        const results = {};
+        
+        checks.forEach(check => {
+            exec(check.command, (error, stdout, stderr) => {
+                results[check.name] = !error;
+                completed++;
+                
+                if (completed === checks.length) {
+                    const allPassed = Object.values(results).every(result => result);
+                    if (allPassed) {
+                        resolve(results);
+                    } else {
+                        reject(new Error(`System validation failed: ${Object.keys(results).filter(k => !results[k]).join(', ')}`));
+                    }
+                }
+            });
+        });
+    });
+}
 
 function createWindow() {
     // Create the browser window
@@ -27,14 +80,14 @@ function createWindow() {
         },
         icon: path.join(__dirname, 'assets', 'icon.png'),
         titleBarStyle: 'default',
-        show: true,  // Changed to true to force show immediately
+        show: true,
         frame: true,
         resizable: true,
         maximizable: true,
         minimizable: true,
         closable: true,
         autoHideMenuBar: false,
-        center: true,  // Center the window on screen
+        center: true,
         alwaysOnTop: false
     });
 
@@ -45,12 +98,16 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
         log.info('Application window shown');
+        
+        // Validate system requirements
+        validateSystemRequirements().then(() => {
+            log.info('System requirements validated successfully');
+        }).catch(error => {
+            log.error('System validation failed:', error);
+            dialog.showErrorBox('System Requirements', 
+                'Some system requirements are not met. The application may not function properly.\n\n' + error.message);
+        });
     });
-
-    // Open DevTools in development
-    if (process.argv.includes('--dev')) {
-        mainWindow.webContents.openDevTools();
-    }
 
     // Handle window closed
     mainWindow.on('closed', function() {
@@ -173,36 +230,55 @@ function createMenu() {
     Menu.setApplicationMenu(menu);
 }
 
-// IPC handlers for system operations
-ipcMain.handle('get-system-info', async () => {
-    try {
-        const systemInfo = await getSystemInformation();
-        return systemInfo;
-    } catch (error) {
-        log.error('Error getting system info:', error);
-        return null;
-    }
-});
+// Enhanced IPC handlers with robust error handling
+ipcMain.handle('get-system-info', withErrorHandling(async () => {
+    const systemInfo = await getSystemInformation();
+    return systemInfo;
+}, 'Failed to get system information'));
 
-ipcMain.handle('scan-temp-files', async () => {
-    try {
-        const tempFiles = await scanTempFiles();
-        return tempFiles;
-    } catch (error) {
-        log.error('Error scanning temp files:', error);
-        return [];
-    }
-});
+ipcMain.handle('scan-temp-files', withErrorHandling(async () => {
+    const tempFiles = await scanTempFiles();
+    return tempFiles;
+}, 'Failed to scan temporary files'));
 
-ipcMain.handle('cleanup-files', async (event, filePaths) => {
-    try {
-        const result = await cleanupFiles(filePaths);
-        return result;
-    } catch (error) {
-        log.error('Error cleaning up files:', error);
-        return { success: false, error: error.message };
-    }
-});
+ipcMain.handle('cleanup-files', withErrorHandling(async (event, filePaths) => {
+    const result = await cleanupFiles(filePaths);
+    return result;
+}, 'Failed to cleanup files'));
+
+// Enhanced bloatware scanning with better detection
+ipcMain.handle('scan-bloatware-enhanced', withErrorHandling(async () => {
+    const bloatwareData = await scanBloatwareEnhanced();
+    return bloatwareData;
+}, 'Failed to scan for bloatware'));
+
+// Enhanced duplicate file scanning with merge options
+ipcMain.handle('scan-duplicate-files-enhanced', withErrorHandling(async (event, scanPath) => {
+    const duplicates = await scanForDuplicateFilesEnhanced(scanPath || 'C:\\');
+    return duplicates;
+}, 'Failed to scan for duplicate files'));
+
+// Registry cleanup for complete app removal
+ipcMain.handle('cleanup-registry', withErrorHandling(async (event, appName) => {
+    const result = await cleanupRegistryEntries(appName);
+    return result;
+}, 'Failed to cleanup registry entries'));
+
+// Enhanced space saver operations
+ipcMain.handle('purge-recycle-bin', withErrorHandling(async () => {
+    const result = await purgeRecycleBin();
+    return result;
+}, 'Failed to purge recycle bin'));
+
+ipcMain.handle('clear-all-temp-data', withErrorHandling(async () => {
+    const result = await clearAllTempData();
+    return result;
+}, 'Failed to clear temp data'));
+
+ipcMain.handle('merge-duplicate-files', withErrorHandling(async (event, duplicateGroups, mergeStrategy) => {
+    const result = await mergeDuplicateFiles(duplicateGroups, mergeStrategy);
+    return result;
+}, 'Failed to merge duplicate files'));
 
 ipcMain.handle('get-startup-items', async () => {
     try {
@@ -253,6 +329,342 @@ ipcMain.handle('uninstall-program', async (event, programName) => {
         return { success: false, error: error.message };
     }
 });
+
+// IPC handler to open a folder browser dialog and return the selected path
+ipcMain.handle('browse-folder', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    return result.filePaths[0];
+});
+
+// IPC handler to scan for duplicate files
+ipcMain.handle('scan-duplicate-files', async (event, scanPath) => {
+    try {
+        const duplicates = await scanForDuplicateFiles(scanPath || 'C:\\');
+        return duplicates;
+    } catch (error) {
+        log.error('Error scanning for duplicate files:', error);
+        return [];
+    }
+});
+
+// IPC handler to clear the Recycle Bin
+ipcMain.handle('clear-recycle-bin', async () => {
+    try {
+        const result = await clearRecycleBin();
+        return result;
+    } catch (error) {
+        log.error('Error clearing Recycle Bin:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+// IPC handler to clear all temp files (one-click)
+ipcMain.handle('clear-all-temp-files', async () => {
+    try {
+        const result = await clearAllTempFiles();
+        return result;
+    } catch (error) {
+        log.error('Error clearing all temp files:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+// Enhanced function to scan for duplicate files with better performance and metadata
+async function scanForDuplicateFilesEnhanced(rootPath) {
+    const fileMap = new Map(); // key: size, value: array of file paths
+    const hashMap = new Map(); // key: hash, value: array of file paths
+    const duplicates = [];
+    const scannedFiles = new Set();
+    let totalFiles = 0;
+    let processedFiles = 0;
+
+    // Enhanced directory walker with progress tracking
+    function walk(dir, depth = 0) {
+        if (depth > 10) return; // Prevent infinite recursion
+        
+        let files;
+        try {
+            files = fs.readdirSync(dir);
+        } catch (e) {
+            log.warn('Cannot read directory:', dir, e.message);
+            return;
+        }
+        
+        for (const file of files) {
+            const filePath = path.join(dir, file);
+            
+            // Skip system files and hidden files
+            if (file.startsWith('.') || file === 'System Volume Information' || 
+                file === '$Recycle.Bin' || file === 'Windows' || file === 'Program Files') {
+                continue;
+            }
+            
+            let stats;
+            try {
+                stats = fs.statSync(filePath);
+            } catch (e) {
+                continue;
+            }
+            
+            if (stats.isDirectory()) {
+                walk(filePath, depth + 1);
+            } else if (stats.isFile() && stats.size > 0) { // Only process non-empty files
+                totalFiles++;
+                const size = stats.size;
+                if (!fileMap.has(size)) fileMap.set(size, []);
+                fileMap.get(size).push({
+                    path: filePath,
+                    size: size,
+                    modified: stats.mtime,
+                    created: stats.birthtime
+                });
+            }
+        }
+    }
+
+    log.info('Starting enhanced duplicate file scan in:', rootPath);
+    walk(rootPath);
+
+    // Process files by size groups for better performance
+    for (const [size, files] of fileMap.entries()) {
+        if (files.length < 2) continue;
+        
+        // For small files, use full hash comparison
+        if (size < 1024 * 1024) { // Less than 1MB
+            const hashGroups = {};
+            for (const file of files) {
+                let hash;
+                try {
+                    const data = fs.readFileSync(file.path);
+                    hash = crypto.createHash('md5').update(data).digest('hex');
+                } catch (e) {
+                    log.warn('Cannot read file for hashing:', file.path, e.message);
+                    continue;
+                }
+                if (!hashGroups[hash]) hashGroups[hash] = [];
+                hashGroups[hash].push(file);
+            }
+            
+            for (const group of Object.values(hashGroups)) {
+                if (group.length > 1) {
+                    duplicates.push({
+                        files: group,
+                        size: size,
+                        totalSize: size * group.length,
+                        type: 'exact_duplicate'
+                    });
+                }
+            }
+        } else {
+            // For large files, use partial hash comparison
+            const hashGroups = {};
+            for (const file of files) {
+                let hash;
+                try {
+                    const stream = fs.createReadStream(file.path, { start: 0, end: 8191 }); // First 8KB
+                    const hash = crypto.createHash('md5');
+                    hash.update(stream);
+                    const partialHash = hash.digest('hex');
+                } catch (e) {
+                    log.warn('Cannot read file for partial hashing:', file.path, e.message);
+                    continue;
+                }
+                if (!hashGroups[hash]) hashGroups[hash] = [];
+                hashGroups[hash].push(file);
+            }
+            
+            for (const group of Object.values(hashGroups)) {
+                if (group.length > 1) {
+                    duplicates.push({
+                        files: group,
+                        size: size,
+                        totalSize: size * group.length,
+                        type: 'potential_duplicate'
+                    });
+                }
+            }
+        }
+        
+        processedFiles += files.length;
+        log.info(`Processed ${processedFiles}/${totalFiles} files, found ${duplicates.length} duplicate groups`);
+    }
+    
+    log.info('Enhanced duplicate scan completed:', duplicates.length, 'groups found');
+    return duplicates;
+}
+
+// Enhanced function to scan for duplicate files (backward compatibility)
+async function scanForDuplicateFiles(rootPath) {
+    const enhancedResults = await scanForDuplicateFilesEnhanced(rootPath);
+    return enhancedResults.map(group => group.files.map(file => file.path));
+}
+
+// Enhanced function to purge Recycle Bin with detailed reporting
+async function purgeRecycleBin() {
+    return new Promise((resolve) => {
+        const psCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -Command "' +
+            '$recycleBin = Get-ChildItem $env:SystemDrive\\`$Recycle.Bin -Recurse -Force -ErrorAction SilentlyContinue; ' +
+            '$totalSize = ($recycleBin | Measure-Object -Property Length -Sum).Sum; ' +
+            '$fileCount = $recycleBin.Count; ' +
+            'Clear-RecycleBin -Force -ErrorAction SilentlyContinue; ' +
+            'Write-Output \"$fileCount|$totalSize\"" +
+        '"';
+        
+        exec(psCmd, (error, stdout, stderr) => {
+            if (error) {
+                log.error('PowerShell purge-recycle-bin error:', error);
+                resolve({ success: false, error: error.message });
+                return;
+            }
+            
+            const output = stdout.toString().trim();
+            const parts = output.split('|');
+            const fileCount = parseInt(parts[0]) || 0;
+            const totalSize = parseInt(parts[1]) || 0;
+            
+            resolve({ 
+                success: true, 
+                message: `Recycle Bin purged successfully`,
+                fileCount: fileCount,
+                totalSize: totalSize,
+                freedSpace: totalSize
+            });
+        });
+    });
+}
+
+// Enhanced function to clear all temp data comprehensively
+async function clearAllTempData() {
+    const tempPaths = [
+        process.env.TEMP,
+        process.env.TMP,
+        'C:\\Windows\\Temp',
+        path.join(process.env.LOCALAPPDATA, 'Temp'),
+        path.join(process.env.APPDATA, 'Temp'),
+        'C:\\Windows\\Prefetch',
+        path.join(process.env.LOCALAPPDATA, 'Microsoft', 'Windows', 'INetCache'),
+        path.join(process.env.LOCALAPPDATA, 'Microsoft', 'Windows', 'WebCache'),
+        path.join(process.env.LOCALAPPDATA, 'Microsoft', 'Windows', 'History'),
+        path.join(process.env.LOCALAPPDATA, 'Microsoft', 'Windows', 'Cookies')
+    ].filter(p => p);
+    
+    let totalDeleted = 0;
+    let totalSize = 0;
+    const errors = [];
+    const results = {};
+    
+    for (const tempPath of tempPaths) {
+        if (!fs.existsSync(tempPath)) continue;
+        
+        try {
+            const stats = await getDirectoryStats(tempPath);
+            const deleted = await clearDirectory(tempPath);
+            
+            results[tempPath] = {
+                deleted: deleted.count,
+                size: deleted.size,
+                errors: deleted.errors
+            };
+            
+            totalDeleted += deleted.count;
+            totalSize += deleted.size;
+            errors.push(...deleted.errors);
+            
+        } catch (error) {
+            log.error('Error clearing temp path:', tempPath, error);
+            errors.push({ path: tempPath, error: error.message });
+        }
+    }
+    
+    return {
+        success: true,
+        totalDeleted,
+        totalSize,
+        errors,
+        results
+    };
+}
+
+// Helper function to get directory statistics
+async function getDirectoryStats(dirPath) {
+    return new Promise((resolve, reject) => {
+        const psCmd = `powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '${dirPath}' -Recurse -Force -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum"`;
+        exec(psCmd, (error, stdout, stderr) => {
+            if (error) {
+                resolve({ count: 0, size: 0 });
+                return;
+            }
+            
+            const lines = stdout.toString().split('\n');
+            const countMatch = lines.find(line => line.includes('Count'));
+            const sumMatch = lines.find(line => line.includes('Sum'));
+            
+            const count = countMatch ? parseInt(countMatch.split(':')[1]) || 0 : 0;
+            const size = sumMatch ? parseInt(sumMatch.split(':')[1]) || 0 : 0;
+            
+            resolve({ count, size });
+        });
+    });
+}
+
+// Helper function to clear directory contents
+async function clearDirectory(dirPath) {
+    return new Promise((resolve) => {
+        const psCmd = `powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '${dirPath}' -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"`;
+        exec(psCmd, (error, stdout, stderr) => {
+            resolve({ count: 0, size: 0, errors: error ? [error.message] : [] });
+        });
+    });
+}
+
+// Function to clear the Recycle Bin using PowerShell (backward compatibility)
+async function clearRecycleBin() {
+    const result = await purgeRecycleBin();
+    return result;
+}
+
+// Function to clear all temp files in common temp directories
+async function clearAllTempFiles() {
+    const tempPaths = [
+        process.env.TEMP,
+        process.env.TMP,
+        'C:\\Windows\\Temp',
+        path.join(process.env.LOCALAPPDATA, 'Temp')
+    ].filter(p => p);
+    let deletedCount = 0;
+    let totalSize = 0;
+    let errors = [];
+    for (const tempPath of tempPaths) {
+        if (!fs.existsSync(tempPath)) continue;
+        const files = fs.readdirSync(tempPath);
+        for (const file of files) {
+            const filePath = path.join(tempPath, file);
+            try {
+                const stats = fs.statSync(filePath);
+                if (stats.isFile()) {
+                    totalSize += stats.size;
+                    fs.unlinkSync(filePath);
+                    deletedCount++;
+                } else if (stats.isDirectory()) {
+                    // Recursively delete directory
+                    fs.rmSync(filePath, { recursive: true, force: true });
+                    deletedCount++;
+                }
+            } catch (err) {
+                errors.push({ file: filePath, error: err.message });
+            }
+        }
+    }
+    return {
+        success: true,
+        deletedCount,
+        totalSize,
+        errors
+    };
+}
 
 // System operation functions
 async function getSystemInformation() {
@@ -439,47 +851,172 @@ async function cleanupFiles(filePaths) {
     };
 }
 
-// === PowerShell-based implementations to replace deprecated WMIC ===
-async function getInstalledPrograms() {
+// Enhanced bloatware scanning with comprehensive detection
+async function scanBloatwareEnhanced() {
     return new Promise((resolve) => {
         const psCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -Command "' +
-            `Get-ItemProperty @('HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*','HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*','HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*') ` +
-            `| Where-Object { $_.DisplayName } ` +
-            `| Select-Object DisplayName,Publisher,DisplayVersion,EstimatedSize ` +
-            `| ConvertTo-Json -Compress` +
+            // Get installed programs from registry
+            '$installed = Get-ItemProperty @(' +
+            '"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",' +
+            '"HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",' +
+            '"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*") ' +
+            '| Where-Object { $_.DisplayName } | Select-Object DisplayName,Publisher,DisplayVersion,EstimatedSize,InstallDate; ' +
+            
+            // Get UWP apps
+            '$uwpApps = Get-AppxPackage -AllUsers | Select-Object Name,PackageFullName,Publisher,InstallLocation; ' +
+            
+            // Get provisioned apps
+            '$provApps = Get-AppxProvisionedPackage -Online | Select-Object DisplayName,PackageName; ' +
+            
+            // Combine and categorize
+            '$allApps = @(); ' +
+            '$installed | ForEach-Object { $allApps += [PSCustomObject]@{ ' +
+            'Name = $_.DisplayName; ' +
+            'Publisher = $_.Publisher; ' +
+            'Version = $_.DisplayVersion; ' +
+            'Size = $_.EstimatedSize; ' +
+            'Type = "Installed"; ' +
+            'InstallDate = $_.InstallDate; ' +
+            'Location = "Registry" } }; ' +
+            
+            '$uwpApps | ForEach-Object { $allApps += [PSCustomObject]@{ ' +
+            'Name = $_.Name; ' +
+            'Publisher = $_.Publisher; ' +
+            'Version = "UWP"; ' +
+            'Size = "Unknown"; ' +
+            'Type = "UWP"; ' +
+            'InstallDate = "Unknown"; ' +
+            'Location = $_.InstallLocation } }; ' +
+            
+            '$allApps | ConvertTo-Json -Compress' +
         '"';
 
         exec(psCmd, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
             if (error || !stdout) {
-                log.error('PowerShell getInstalledPrograms error:', error || 'no output');
-                resolve([]);
+                log.error('PowerShell scanBloatwareEnhanced error:', error || 'no output');
+                resolve({ preinstalled: [], thirdParty: [], uwp: [], system: [] });
                 return;
             }
+            
             try {
                 let data = JSON.parse(stdout.toString());
                 if (!Array.isArray(data)) data = [data];
-                const programs = data.map(p => {
-                    // EstimatedSize is in KB, convert to MB for display
-                    let sizeInMB = 'Unknown';
-                    if (p.EstimatedSize && !isNaN(p.EstimatedSize)) {
-                        const sizeKB = parseInt(p.EstimatedSize);
-                        sizeInMB = Math.round(sizeKB / 1024) || 1; // At least 1 MB
-                    }
-                    
-                    return {
-                        name: p.DisplayName || 'Unknown',
-                        publisher: p.Publisher || 'Unknown',
-                        version: p.DisplayVersion || 'Unknown',
-                        size: sizeInMB
-                    };
-                });
-                resolve(programs);
+                
+                const categorizedApps = categorizeBloatwareApps(data);
+                resolve(categorizedApps);
+                
             } catch (err) {
-                log.error('Parse installed programs JSON failed:', err);
-                resolve([]);
+                log.error('Parse bloatware JSON failed:', err);
+                resolve({ preinstalled: [], thirdParty: [], uwp: [], system: [] });
             }
         });
     });
+}
+
+// Enhanced app categorization with better bloatware detection
+function categorizeBloatwareApps(apps) {
+    const knownBloatware = [
+        'candy crush', 'disney magic', 'netflix', 'spotify', 'twitter', 'instagram', 'facebook', 'tiktok',
+        'xbox game bar', 'mixed reality', 'your phone', 'cortana', 'groove music', 'movies & tv', 'skype',
+        'solitaire', 'bubble witch', 'march of empires', 'hidden city', 'farmville', 'minecraft', 'roblox',
+        'asphalt', 'flipboard', 'pinterest', 'linkedin', 'whatsapp', 'telegram', 'discord', 'zoom',
+        'adobe creative cloud', 'mcafee', 'norton', 'avast', 'avg', 'ccleaner', 'driver booster',
+        'advanced systemcare', 'pc cleaner', 'registry cleaner', 'toolbar', 'search protect',
+        'browser hijacker', 'adware', 'trial', 'demo', 'free version', 'limited edition'
+    ];
+
+    const systemApps = [
+        'windows security', 'windows defender', 'edge', 'notepad', 'calculator', 'camera', 'mail',
+        'calendar', 'weather', 'maps', 'photos', 'clock', 'sticky notes', 'snipping tool', 'paint',
+        'wordpad', 'windows media player', 'internet explorer', 'windows store', 'settings',
+        'control panel', 'file explorer', 'task manager', 'device manager', 'disk management'
+    ];
+
+    const microsoftApps = [
+        'microsoft office', 'word', 'excel', 'powerpoint', 'outlook', 'access', 'publisher',
+        'visual studio', 'sql server', 'azure', 'teams', 'onedrive', 'sharepoint', 'dynamics'
+    ];
+
+    const categorized = {
+        preinstalled: [],
+        thirdParty: [],
+        uwp: [],
+        system: []
+    };
+
+    apps.forEach(app => {
+        const name = (app.Name || '').toLowerCase();
+        const publisher = (app.Publisher || '').toLowerCase();
+        const type = app.Type || 'Unknown';
+        
+        // Determine category and risk level
+        let category = 'thirdParty';
+        let risk = 'Medium';
+        let recommendation = 'Review';
+        let description = '';
+        
+        // Check for known bloatware
+        const isBloatware = knownBloatware.some(bloat => name.includes(bloat));
+        const isSystem = systemApps.some(sys => name.includes(sys));
+        const isMicrosoft = microsoftApps.some(ms => name.includes(ms)) || publisher.includes('microsoft');
+        const isUWP = type === 'UWP';
+        
+        if (isBloatware) {
+            category = 'preinstalled';
+            risk = 'Safe';
+            recommendation = 'Remove';
+            description = `Bloatware: ${app.Name}`;
+        } else if (isSystem) {
+            category = 'system';
+            risk = 'High';
+            recommendation = 'Keep';
+            description = `System app: ${app.Name}`;
+        } else if (isMicrosoft && !isBloatware) {
+            category = 'preinstalled';
+            risk = 'Medium';
+            recommendation = 'Review';
+            description = `Microsoft app: ${app.Name}`;
+        } else if (isUWP) {
+            category = 'uwp';
+            risk = 'Medium';
+            recommendation = 'Review';
+            description = `UWP app: ${app.Name}`;
+        } else {
+            category = 'thirdParty';
+            risk = 'Medium';
+            recommendation = 'Review';
+            description = `Third-party app: ${app.Name}`;
+        }
+        
+        const appData = {
+            name: app.Name || 'Unknown',
+            publisher: app.Publisher || 'Unknown',
+            version: app.Version || 'Unknown',
+            size: app.Size || 'Unknown',
+            type: type,
+            risk: risk,
+            recommendation: recommendation,
+            description: description,
+            installDate: app.InstallDate || 'Unknown',
+            location: app.Location || 'Unknown',
+            realName: app.Name
+        };
+        
+        categorized[category].push(appData);
+    });
+    
+    return categorized;
+}
+
+// === PowerShell-based implementations to replace deprecated WMIC ===
+async function getInstalledPrograms() {
+    const enhancedResults = await scanBloatwareEnhanced();
+    return [
+        ...enhancedResults.preinstalled,
+        ...enhancedResults.thirdParty,
+        ...enhancedResults.uwp,
+        ...enhancedResults.system
+    ];
 }
 
 async function getStartupItems() {
@@ -571,32 +1108,271 @@ async function getSystemStats() {
     });
 }
 
+// Enhanced registry cleanup for complete app removal
+async function cleanupRegistryEntries(appName) {
+    return new Promise((resolve) => {
+        const sanitized = appName.replace(/`/g, '').replace(/'/g, "''");
+        
+        const psScript = `
+        Try {
+            $cleaned = @()
+            $errors = @()
+            
+            # Registry paths to clean
+            $regPaths = @(
+                'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                'HKLM:SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths',
+                'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths',
+                'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run',
+                'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run',
+                'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce',
+                'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce'
+            )
+            
+            foreach ($regPath in $regPaths) {
+                try {
+                    $items = Get-ChildItem $regPath -ErrorAction SilentlyContinue | Where-Object {
+                        ($_.GetValue('DisplayName') -like '*${sanitized}*') -or
+                        ($_.GetValue('DisplayName') -like '*${sanitized.split(' ')[0]}*') -or
+                        ($_.Name -like '*${sanitized}*')
+                    }
+                    
+                    foreach ($item in $items) {
+                        try {
+                            Remove-Item $item.PsPath -Recurse -Force -ErrorAction SilentlyContinue
+                            $cleaned += "$regPath\\$($item.PSChildName)"
+                        } catch {
+                            $errors += "Failed to remove $regPath\\$($item.PSChildName): $($_.Exception.Message)"
+                        }
+                    }
+                } catch {
+                    $errors += "Failed to access $regPath: $($_.Exception.Message)"
+                }
+            }
+            
+            # Clean file associations
+            $assocPaths = @(
+                'HKLM:SOFTWARE\\Classes',
+                'HKCU:SOFTWARE\\Classes'
+            )
+            
+            foreach ($assocPath in $assocPaths) {
+                try {
+                    $assocs = Get-ChildItem $assocPath -ErrorAction SilentlyContinue | Where-Object {
+                        $_.Name -like '*${sanitized}*'
+                    }
+                    
+                    foreach ($assoc in $assocs) {
+                        try {
+                            Remove-Item $assoc.PsPath -Recurse -Force -ErrorAction SilentlyContinue
+                            $cleaned += "$assocPath\\$($assoc.PSChildName)"
+                        } catch {
+                            $errors += "Failed to remove association $assocPath\\$($assoc.PSChildName): $($_.Exception.Message)"
+                        }
+                    }
+                } catch {
+                    $errors += "Failed to access $assocPath: $($_.Exception.Message)"
+                }
+            }
+            
+            $result = @{
+                cleaned = $cleaned
+                errors = $errors
+                success = $true
+            }
+            
+            $result | ConvertTo-Json -Compress
+        } Catch {
+            @{
+                cleaned = @()
+                errors = @($_.Exception.Message)
+                success = $false
+            } | ConvertTo-Json -Compress
+        }`.replace(/\s+/g, ' ').trim();
+
+        const psCmd = `powershell -NoProfile -ExecutionPolicy Bypass -Command "${psScript}"`;
+
+        exec(psCmd, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
+            if (error) {
+                log.error('PowerShell registry cleanup error:', error);
+                resolve({ success: false, error: error.message });
+                return;
+            }
+            
+            try {
+                const result = JSON.parse(stdout.toString());
+                log.info('Registry cleanup completed for:', appName, result);
+                resolve(result);
+            } catch (err) {
+                log.error('Parse registry cleanup JSON failed:', err);
+                resolve({ success: false, error: 'Failed to parse registry cleanup results' });
+            }
+        });
+    });
+}
+
+// Enhanced duplicate file merge with multiple strategies
+async function mergeDuplicateFiles(duplicateGroups, mergeStrategy) {
+    return new Promise((resolve) => {
+        let deletedCount = 0;
+        let totalSize = 0;
+        const errors = [];
+        
+        duplicateGroups.forEach(group => {
+            if (group.files && group.files.length > 1) {
+                const files = group.files;
+                let filesToDelete = [];
+                
+                switch (mergeStrategy) {
+                    case 'keep_oldest':
+                        // Keep the oldest file, delete the rest
+                        files.sort((a, b) => new Date(a.created) - new Date(b.created));
+                        filesToDelete = files.slice(1);
+                        break;
+                    case 'keep_newest':
+                        // Keep the newest file, delete the rest
+                        files.sort((a, b) => new Date(b.created) - new Date(a.created));
+                        filesToDelete = files.slice(1);
+                        break;
+                    case 'keep_first':
+                        // Keep the first file, delete the rest
+                        filesToDelete = files.slice(1);
+                        break;
+                    case 'keep_last':
+                        // Keep the last file, delete the rest
+                        filesToDelete = files.slice(0, -1);
+                        break;
+                    case 'delete_all_but_one':
+                        // Keep one file, delete all others
+                        filesToDelete = files.slice(1);
+                        break;
+                    default:
+                        // Default: keep the first file
+                        filesToDelete = files.slice(1);
+                }
+                
+                // Delete the selected files
+                filesToDelete.forEach(file => {
+                    try {
+                        if (fs.existsSync(file.path)) {
+                            const stats = fs.statSync(file.path);
+                            fs.unlinkSync(file.path);
+                            deletedCount++;
+                            totalSize += stats.size;
+                        }
+                    } catch (error) {
+                        errors.push({ file: file.path, error: error.message });
+                    }
+                });
+            }
+        });
+        
+        resolve({
+            success: true,
+            deletedCount,
+            totalSize,
+            errors,
+            message: `Merged ${duplicateGroups.length} duplicate groups, deleted ${deletedCount} files`
+        });
+    });
+}
+
 async function uninstallProgram(programName) {
     return new Promise((resolve) => {
         // Sanitize and properly quote the application name for PowerShell
         const sanitized = programName.replace(/`/g, '').replace(/'/g, "''"); // escape single quotes for PowerShell
-        
-        // Build PowerShell script with proper syntax (no backslash escaping needed for command line)
-        const psScript = `Try {
+
+        // Enhanced PowerShell script for deep removal with registry cleanup
+        const psScript = `
+        Try {
+            $found = $false
+            $removalMethods = @()
+            
+            # 1. Try Get-Package/Uninstall-Package
             $app = Get-Package -Name '${sanitized}' -ErrorAction SilentlyContinue;
             if ($app) {
-                $app | Uninstall-Package -Force; Write-Output 'SUCCESS:Removed via Get-Package'; return
+                $app | Uninstall-Package -Force -ErrorAction SilentlyContinue;
+                $removalMethods += "Get-Package"
+                $found = $true
             }
+            
+            # 2. Try winget
             if (Get-Command winget -ErrorAction SilentlyContinue) {
                 $result = winget uninstall '${sanitized}' --silent --accept-source-agreements 2>$null;
-                if ($LASTEXITCODE -eq 0) { Write-Output 'SUCCESS:Removed via winget'; return }
+                if ($LASTEXITCODE -eq 0) { 
+                    $removalMethods += "winget"
+                    $found = $true
+                }
             }
+            
+            # 3. Try WMI
             $app = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq '${sanitized}' };
             if ($app) {
-                $null = $app.Uninstall(); Write-Output 'SUCCESS:Removed via WMI'; return
+                $null = $app.Uninstall();
+                $removalMethods += "WMI"
+                $found = $true
             }
-            $app = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like '*${sanitized.split(' ')[0]}*' };
-            if ($app) {
-                $null = $app.Uninstall(); Write-Output 'SUCCESS:Removed via WMI partial match'; return
+            
+            # 4. Try UWP/Provisioned App removal (for preloaded apps)
+            $uwp = Get-AppxPackage -Name '*${sanitized}*' -ErrorAction SilentlyContinue;
+            if ($uwp) {
+                $uwp | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue;
+                $removalMethods += "Remove-AppxPackage"
+                $found = $true
             }
+            
+            $prov = Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -like '*${sanitized}*' };
+            if ($prov) {
+                $prov | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue;
+                $removalMethods += "Remove-AppxProvisionedPackage"
+                $found = $true
+            }
+            
+            # 5. Enhanced Registry Cleanup
+            if ($found) {
+                $regPaths = @(
+                    'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                    'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                    'HKLM:SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall',
+                    'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths',
+                    'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths'
+                )
+                
+                foreach ($regPath in $regPaths) {
+                    Get-ChildItem $regPath -ErrorAction SilentlyContinue | Where-Object {
+                        ($_.GetValue('DisplayName') -like '*${sanitized}*') -or
+                        ($_.Name -like '*${sanitized}*')
+                    } | ForEach-Object {
+                        Remove-Item $_.PsPath -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+                
+                # Remove leftover files
+                $folders = @(
+                    "$env:ProgramFiles\\*${sanitized}*",
+                    "$env:ProgramFiles(x86)\\*${sanitized}*",
+                    "$env:LOCALAPPDATA\\*${sanitized}*",
+                    "$env:APPDATA\\*${sanitized}*"
+                )
+                
+                foreach ($folder in $folders) {
+                    Get-ChildItem -Path $folder -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+                }
+                
+                # Remove Start Menu shortcuts
+                $startMenu = "$env:ProgramData\\Microsoft\\Windows\\Start Menu\\Programs"
+                Get-ChildItem -Path $startMenu -Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -like '*${sanitized}*' } | Remove-Item -Force -ErrorAction SilentlyContinue
+                
+                $removalMethods += "Registry Cleanup"
+                Write-Output "SUCCESS:Removed via $($removalMethods -join ', ')"
+                return
+            }
+            
             Write-Output 'NOTFOUND'
         } Catch {
-            Write-Output $_.Exception.Message
+            Write-Output "ERROR:$($_.Exception.Message)"
         }`.replace(/\s+/g, ' ').trim();
 
         const psCmd = `powershell -NoProfile -ExecutionPolicy Bypass -Command "${psScript}"`;
@@ -614,6 +1390,9 @@ async function uninstallProgram(programName) {
             } else if (/NOTFOUND/i.test(output)) {
                 log.warn('Program not found for uninstall:', programName);
                 resolve({ success: false, error: 'Program not found' });
+            } else if (/ERROR/i.test(output)) {
+                log.error('Uninstall failed:', output);
+                resolve({ success: false, error: output.replace('ERROR:', '') });
             } else {
                 log.error('Uninstall failed:', output);
                 resolve({ success: false, error: output });

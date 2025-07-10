@@ -271,8 +271,69 @@
             100% { transform: scale(1); }
         }
 
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 50%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
         .scanning {
             animation: pulse 1s infinite;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 400px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
         }
     </style>
 </head>
@@ -300,12 +361,81 @@
 
         <!-- Disk Cleanup Tab -->
         <div class="tab-content active" id="disk-cleanup">
-            <!-- Controls moved to top -->
+            <!-- Enhanced Controls with Space Saver Features -->
             <div class="controls" style="margin-bottom: 20px;">
                 <button class="btn" onclick="scanForFiles()">🔍 Scan System</button>
                 <button class="btn btn-success" onclick="selectAllCleanup()">✅ Select All</button>
                 <button class="btn" onclick="deselectAllCleanup()">❌ Deselect All</button>
                 <button class="btn btn-danger" onclick="cleanupSelected()">🧹 Clean Selected</button>
+                
+                <!-- Enhanced Space Saver Controls -->
+                <div style="border-top: 1px solid #e9ecef; margin-top: 15px; padding-top: 15px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">🚀 Space Saver Tools</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-danger" onclick="purgeRecycleBinEnhanced()">🗑️ Purge Recycle Bin</button>
+                        <button class="btn btn-danger" onclick="clearAllTempDataEnhanced()">🧹 Clear All Temp Data</button>
+                        <button class="btn" onclick="scanDuplicateFilesEnhanced()">🔎 Enhanced Duplicate Scan</button>
+                        <button class="btn" onclick="browseAndScanDuplicatesEnhanced()">📁 Browse for Duplicates</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Duplicate Files Modal with Merge Options -->
+            <div id="duplicate-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(44,62,80,0.7); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:white; border-radius:15px; max-width:1000px; width:95vw; max-height:85vh; overflow:auto; padding:30px; position:relative;">
+                    <button onclick="closeDuplicateModal()" style="position:absolute; top:15px; right:20px; background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
+                    <h2>🔍 Enhanced Duplicate Files Scanner</h2>
+                    
+                    <!-- Merge Strategy Selection -->
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 10px;">Merge Strategy</h4>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="mergeStrategy" value="keep_oldest" checked> Keep Oldest
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="mergeStrategy" value="keep_newest"> Keep Newest
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="mergeStrategy" value="keep_first"> Keep First
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="mergeStrategy" value="keep_last"> Keep Last
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="radio" name="mergeStrategy" value="individual"> Individual Selection
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Statistics -->
+                    <div id="duplicate-stats" style="margin-bottom: 20px; display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                            <div style="background: #e3f2fd; padding: 10px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.2em; font-weight: bold; color: #1976d2;" id="total-groups">0</div>
+                                <div style="font-size: 0.9em; color: #666;">Duplicate Groups</div>
+                            </div>
+                            <div style="background: #fff3e0; padding: 10px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.2em; font-weight: bold; color: #f57c00;" id="total-files-count">0</div>
+                                <div style="font-size: 0.9em; color: #666;">Total Files</div>
+                            </div>
+                            <div style="background: #e8f5e8; padding: 10px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 1.2em; font-weight: bold; color: #388e3c;" id="potential-space">0 MB</div>
+                                <div style="font-size: 0.9em; color: #666;">Potential Space</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="duplicate-files-list"></div>
+                    
+                    <!-- Action Buttons -->
+                    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-success" onclick="mergeAllDuplicates()">🔄 Merge All Duplicates</button>
+                        <button class="btn btn-danger" onclick="deleteSelectedDuplicates()">🗑️ Delete Selected</button>
+                        <button class="btn" onclick="selectAllDuplicates()">✅ Select All</button>
+                        <button class="btn" onclick="deselectAllDuplicates()">❌ Deselect All</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Log box moved to underneath buttons -->
@@ -743,8 +873,19 @@
             btn.disabled = true;
 
             try {
-                // Use real system scanning if available
-                if (window.electronAPI && window.electronAPI.getInstalledPrograms) {
+                // Use enhanced bloatware scanning if available
+                if (window.electronAPI && window.electronAPI.scanBloatwareEnhanced) {
+                    const enhancedBloatwareData = await window.electronAPI.scanBloatwareEnhanced();
+                    console.log('Enhanced bloatware scan results:', enhancedBloatwareData);
+                    
+                    // Filter out already removed apps
+                    Object.keys(enhancedBloatwareData).forEach(category => {
+                        enhancedBloatwareData[category] = enhancedBloatwareData[category].filter(app => !removedApps.has(app.name));
+                    });
+                    
+                    bloatwareData = enhancedBloatwareData;
+                } else if (window.electronAPI && window.electronAPI.getInstalledPrograms) {
+                    // Fallback to basic scanning
                     const installedPrograms = await window.electronAPI.getInstalledPrograms();
                     console.log('Real installed programs found:', installedPrograms);
                     
@@ -766,9 +907,11 @@
                 displayBloatwareApps();
                 updateBloatwareStats();
                 document.getElementById('bloatware-stats').style.display = 'block';
+                
+                showNotification(`✅ Bloatware scan completed!\n\nFound ${Object.values(bloatwareData).reduce((sum, arr) => sum + arr.length, 0)} applications`, 'success');
             } catch (error) {
                 console.error('Error scanning for bloatware:', error);
-                alert('Error scanning for bloatware: ' + error.message);
+                showNotification(`❌ Error scanning for bloatware: ${error.message}`, 'error');
                 // Fallback to mock data
                 generateEnhancedBloatwareData();
                 displayBloatwareApps();
@@ -1120,6 +1263,22 @@
                         
                         if (result.success) {
                             log.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ ${appName} successfully removed\n\n`;
+                            
+                            // Enhanced registry cleanup
+                            if (window.electronAPI && window.electronAPI.cleanupRegistry) {
+                                log.innerHTML += `[${new Date().toLocaleTimeString()}] 🔧 Cleaning registry entries for ${appName}...\n`;
+                                try {
+                                    const registryResult = await window.electronAPI.cleanupRegistry(appName);
+                                    if (registryResult.success) {
+                                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ✅ Registry cleaned: ${registryResult.cleaned.length} entries removed\n`;
+                                    } else {
+                                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ⚠️ Registry cleanup had issues: ${registryResult.errors.length} errors\n`;
+                                    }
+                                } catch (regError) {
+                                    log.innerHTML += `[${new Date().toLocaleTimeString()}] ⚠️ Registry cleanup failed: ${regError.message}\n`;
+                                }
+                            }
+                            
                             // Add to removed apps set to prevent reappearing
                             removedApps.add(appName);
                             item.closest('.bloatware-item').remove();
@@ -1455,24 +1614,37 @@
             }
         }
 
-        // Additional utility functions
+        // Enhanced notification system
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
-            notification.className = type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            notification.className = `notification ${type}`;
             notification.innerHTML = message;
-            notification.style.position = 'fixed';
-            notification.style.top = '20px';
-            notification.style.right = '20px';
-            notification.style.zIndex = '9999';
-            notification.style.maxWidth = '400px';
-            notification.style.borderRadius = '10px';
-            notification.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
             
             document.body.appendChild(notification);
             
+            // Auto-remove after 5 seconds
             setTimeout(() => {
-                notification.remove();
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
             }, 5000);
+            
+            // Allow manual dismissal
+            notification.addEventListener('click', () => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            });
         }
 
         // Add CSS for startup select dropdown
@@ -1589,6 +1761,257 @@
 
         // Initialize performance monitoring
         setTimeout(monitorPerformance, 2000);
+
+        // --- Enhanced Space Saver Functions ---
+        async function purgeRecycleBinEnhanced() {
+            if (!window.electronAPI || !window.electronAPI.purgeRecycleBin) {
+                alert('Enhanced Recycle Bin purging not supported in this environment.');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to permanently purge the Recycle Bin? This action cannot be undone.')) return;
+            
+            try {
+                const result = await window.electronAPI.purgeRecycleBin();
+                if (result.success) {
+                    const freedMB = Math.round(result.freedSpace / (1024 * 1024));
+                    showNotification(`✅ Recycle Bin purged successfully!\n\nFreed up: ${freedMB} MB\nFiles removed: ${result.fileCount}`, 'success');
+                } else {
+                    showNotification(`❌ Failed to purge Recycle Bin: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearAllTempDataEnhanced() {
+            if (!window.electronAPI || !window.electronAPI.clearAllTempData) {
+                alert('Enhanced temp data clearing not supported in this environment.');
+                return;
+            }
+            
+            if (!confirm('Clear all temporary data including browser cache, Windows temp files, and system caches? This cannot be undone.')) return;
+            
+            try {
+                const result = await window.electronAPI.clearAllTempData();
+                if (result.success) {
+                    const freedMB = Math.round(result.totalSize / (1024 * 1024));
+                    showNotification(`✅ Temp data cleared successfully!\n\nFreed up: ${freedMB} MB\nItems removed: ${result.totalDeleted}`, 'success');
+                } else {
+                    showNotification(`❌ Failed to clear temp data: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // --- Enhanced Duplicate File Scanner ---
+        async function scanDuplicateFilesEnhanced() {
+            showDuplicateModal('🔍 Scanning for duplicates in C: drive...\n\nThis may take several minutes for large drives.');
+            try {
+                const duplicates = await window.electronAPI.scanDuplicateFilesEnhanced('C:\\');
+                renderEnhancedDuplicateFiles(duplicates);
+            } catch (error) {
+                document.getElementById('duplicate-files-list').innerHTML = `<p style="color: red;">Error scanning for duplicates: ${error.message}</p>`;
+            }
+        }
+
+        async function browseAndScanDuplicatesEnhanced() {
+            if (!window.electronAPI || !window.electronAPI.browseFolder) {
+                alert('Folder browsing not supported in this environment.');
+                return;
+            }
+            
+            const folder = await window.electronAPI.browseFolder();
+            if (!folder) return;
+            
+            showDuplicateModal(`🔍 Scanning for duplicates in: ${folder}\n\nThis may take several minutes for large folders.`);
+            try {
+                const duplicates = await window.electronAPI.scanDuplicateFilesEnhanced(folder);
+                renderEnhancedDuplicateFiles(duplicates);
+            } catch (error) {
+                document.getElementById('duplicate-files-list').innerHTML = `<p style="color: red;">Error scanning for duplicates: ${error.message}</p>`;
+            }
+        }
+
+        function showDuplicateModal(loadingMsg) {
+            document.getElementById('duplicate-modal').style.display = 'flex';
+            document.getElementById('duplicate-files-list').innerHTML = `<div style="text-align: center; padding: 40px;"><div style="font-size: 1.2em; margin-bottom: 10px;">${loadingMsg}</div><div class="progress-container"><div class="progress-bar" style="width: 0%; animation: progress 2s infinite;"></div></div></div>`;
+            document.getElementById('duplicate-stats').style.display = 'none';
+        }
+
+        function closeDuplicateModal() {
+            document.getElementById('duplicate-modal').style.display = 'none';
+        }
+
+        function renderEnhancedDuplicateFiles(duplicates) {
+            if (!duplicates || !duplicates.length) {
+                document.getElementById('duplicate-files-list').innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">No duplicate files found.</p>';
+                document.getElementById('duplicate-stats').style.display = 'none';
+                return;
+            }
+
+            let totalFiles = 0;
+            let totalSize = 0;
+            let html = '';
+
+            duplicates.forEach((group, idx) => {
+                const groupSize = group.size || 0;
+                const fileCount = group.files.length;
+                totalFiles += fileCount;
+                totalSize += group.totalSize || (groupSize * fileCount);
+
+                html += `<div style="margin-bottom: 20px; border: 1px solid #e9ecef; border-radius: 10px; padding: 15px; background: #f8f9fa;">`;
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">`;
+                html += `<h4 style="margin: 0; color: #2c3e50;">Group ${idx + 1} (${fileCount} files, ${formatFileSize(groupSize)})</h4>`;
+                html += `<span style="background: ${group.type === 'exact_duplicate' ? '#4caf50' : '#ff9800'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">${group.type === 'exact_duplicate' ? 'Exact' : 'Potential'}</span>`;
+                html += `</div>`;
+
+                group.files.forEach((file, fidx) => {
+                    const filePath = file.path || file;
+                    const fileName = filePath.split('\\').pop();
+                    const fileDate = file.modified ? new Date(file.modified).toLocaleDateString() : 'Unknown';
+                    
+                    html += `<div style="display: flex; align-items: center; gap: 10px; margin: 5px 0; padding: 8px; background: white; border-radius: 5px;">`;
+                    html += `<input type="checkbox" class="dup-chk" data-path="${filePath}" data-group="${idx}" ${fidx === 0 ? 'checked' : ''}>`;
+                    html += `<div style="flex: 1; min-width: 0;">`;
+                    html += `<div style="font-weight: 600; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${fileName}</div>`;
+                    html += `<div style="font-size: 0.9em; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${filePath}</div>`;
+                    html += `<div style="font-size: 0.8em; color: #999;">Modified: ${fileDate}</div>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            });
+
+            document.getElementById('duplicate-files-list').innerHTML = html;
+            
+            // Update statistics
+            document.getElementById('total-groups').textContent = duplicates.length;
+            document.getElementById('total-files-count').textContent = totalFiles;
+            document.getElementById('potential-space').textContent = formatFileSize(totalSize - (totalSize / duplicates.length));
+            document.getElementById('duplicate-stats').style.display = 'block';
+        }
+
+        async function mergeAllDuplicates() {
+            const strategy = document.querySelector('input[name="mergeStrategy"]:checked').value;
+            
+            if (strategy === 'individual') {
+                const checkboxes = document.querySelectorAll('.dup-chk:checked');
+                if (!checkboxes.length) {
+                    alert('Please select files to delete.');
+                    return;
+                }
+                await deleteSelectedDuplicates();
+                return;
+            }
+
+            if (!confirm(`Merge all duplicates using strategy: ${strategy}? This cannot be undone.`)) return;
+
+            try {
+                // Get all duplicate groups from the current display
+                const groups = [];
+                const groupElements = document.querySelectorAll('#duplicate-files-list > div');
+                
+                groupElements.forEach(groupEl => {
+                    const files = [];
+                    groupEl.querySelectorAll('.dup-chk').forEach(checkbox => {
+                        files.push({
+                            path: checkbox.getAttribute('data-path'),
+                            size: 0, // Will be filled by backend
+                            created: new Date(),
+                            modified: new Date()
+                        });
+                    });
+                    if (files.length > 1) {
+                        groups.push({ files });
+                    }
+                });
+
+                if (groups.length === 0) {
+                    alert('No duplicate groups found to merge.');
+                    return;
+                }
+
+                const result = await window.electronAPI.mergeDuplicateFiles(groups, strategy);
+                
+                if (result.success) {
+                    const freedMB = Math.round(result.totalSize / (1024 * 1024));
+                    showNotification(`✅ Duplicates merged successfully!\n\nFreed up: ${freedMB} MB\nFiles deleted: ${result.deletedCount}`, 'success');
+                    closeDuplicateModal();
+                } else {
+                    showNotification(`❌ Failed to merge duplicates: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteSelectedDuplicates() {
+            const checkboxes = document.querySelectorAll('.dup-chk:checked');
+            if (!checkboxes.length) {
+                alert('No files selected.');
+                return;
+            }
+            
+            if (!confirm(`Delete ${checkboxes.length} selected duplicate files? This cannot be undone.`)) return;
+            
+            try {
+                const files = Array.from(checkboxes).map(cb => cb.getAttribute('data-path'));
+                const result = await window.electronAPI.cleanupFiles(files);
+                
+                if (result.success) {
+                    const freedMB = Math.round(result.totalSize / (1024 * 1024));
+                    showNotification(`✅ Deleted ${result.deletedCount} files successfully!\n\nFreed up: ${freedMB} MB`, 'success');
+                    closeDuplicateModal();
+                } else {
+                    showNotification(`❌ Failed to delete files: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function selectAllDuplicates() {
+            document.querySelectorAll('.dup-chk').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllDuplicates() {
+            document.querySelectorAll('.dup-chk').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // --- Legacy Functions for Backward Compatibility ---
+        async function clearRecycleBin() {
+            await purgeRecycleBinEnhanced();
+        }
+
+        async function clearAllTempFiles() {
+            await clearAllTempDataEnhanced();
+        }
+
+        async function scanDuplicateFiles() {
+            await scanDuplicateFilesEnhanced();
+        }
+
+        async function browseAndScanDuplicates() {
+            await browseAndScanDuplicatesEnhanced();
+        }
+
+        function renderDuplicateFiles(duplicates) {
+            renderEnhancedDuplicateFiles(duplicates);
+        }
     </script>
 </body>
 </html>

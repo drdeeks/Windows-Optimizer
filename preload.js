@@ -11,6 +11,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     scanTempFiles: () => ipcRenderer.invoke('scan-temp-files'),
     cleanupFiles: (filePaths) => ipcRenderer.invoke('cleanup-files', filePaths),
     
+    // Enhanced bloatware scanning
+    scanBloatwareEnhanced: () => ipcRenderer.invoke('scan-bloatware-enhanced'),
+    
+    // Enhanced duplicate file scanning
+    scanDuplicateFilesEnhanced: (scanPath) => ipcRenderer.invoke('scan-duplicate-files-enhanced', scanPath),
+    
+    // Registry cleanup
+    cleanupRegistry: (appName) => ipcRenderer.invoke('cleanup-registry', appName),
+    
+    // Enhanced space saver operations
+    purgeRecycleBin: () => ipcRenderer.invoke('purge-recycle-bin'),
+    clearAllTempData: () => ipcRenderer.invoke('clear-all-temp-data'),
+    mergeDuplicateFiles: (duplicateGroups, mergeStrategy) => ipcRenderer.invoke('merge-duplicate-files', duplicateGroups, mergeStrategy),
+    
     // Program management
     getInstalledPrograms: () => ipcRenderer.invoke('get-installed-programs'),
     uninstallProgram: (programName) => ipcRenderer.invoke('uninstall-program', programName),
@@ -22,12 +36,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Utility functions
     openExternal: (url) => ipcRenderer.invoke('open-external', url),
     showMessageBox: (options) => ipcRenderer.invoke('show-message-box', options),
+    browseFolder: () => ipcRenderer.invoke('browse-folder'),
     
     // App information
     getAppVersion: () => ipcRenderer.invoke('get-app-version'),
     
     // Notifications
-    showNotification: (title, body) => ipcRenderer.invoke('show-notification', title, body)
+    showNotification: (title, body) => ipcRenderer.invoke('show-notification', title, body),
+    
+    // Legacy functions for backward compatibility
+    scanDuplicateFiles: (scanPath) => ipcRenderer.invoke('scan-duplicate-files', scanPath),
+    clearRecycleBin: () => ipcRenderer.invoke('clear-recycle-bin'),
+    clearAllTempFiles: () => ipcRenderer.invoke('clear-all-temp-files')
 });
 
 // Enhanced system integration functions

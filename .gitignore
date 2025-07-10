@@ -150,6 +150,15 @@ dist/
 releases/
 uploads/
 
+# Cursor AI rules and configuration
+.cursor/
+.cursorignore
+.cursorrules
+.cursorrules.local
+
+# Documentation files
+CHANGELOG.md
+
 # Chromium/Electron runtime files
 chrome_*.pak
 *.dll
