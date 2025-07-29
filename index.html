@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinOptimizer Pro v2.0 - Tauri Edition</title>
+    <title>Windows System Optimizer v2.0 - Tauri Edition</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -100,80 +100,46 @@
             align-items: center;
         }
 
+        .section h3::before {
+            content: "🔧";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
         .btn {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            margin: 5px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
         .btn-danger {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
         .btn-success {
             background: linear-gradient(135deg, #27ae60, #229954);
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #fff, #f8f9fa);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #3498db;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
         }
 
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
             overflow: hidden;
             margin: 10px 0;
         }
@@ -181,58 +147,66 @@
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #3498db, #2980b9);
-            transition: width 0.5s ease;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            color: #333;
-            padding: 15px 20px;
+            transition: width 0.3s ease;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            max-width: 350px;
         }
 
-        .notification.show {
-            transform: translateX(0);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
         }
 
-        .notification.success {
-            border-left: 4px solid #27ae60;
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #dee2e6;
         }
 
-        .notification.error {
-            border-left: 4px solid #e74c3c;
+        .stat-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+
+        .list-item:hover {
+            background: #e9ecef;
+        }
+
+        .list-item .info {
+            flex: 1;
+        }
+
+        .list-item .actions {
+            display: flex;
+            gap: 10px;
         }
 
         .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loading.show {
-            display: flex;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -242,623 +216,571 @@
             100% { transform: rotate(360deg); }
         }
 
-        .file-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            background: #f8f9fa;
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
         }
 
-        .file-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s ease;
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        .file-item:hover {
-            background: #e9ecef;
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 2px;
-        }
-
-        .file-path {
-            font-size: 0.8em;
-            color: #7f8c8d;
-        }
-
-        .file-size {
-            color: #3498db;
-            font-weight: 600;
-            min-width: 80px;
-            text-align: right;
-        }
-
-        .system-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .info-value {
-            color: #7f8c8d;
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1500;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
+            background-color: rgba(0,0,0,0.5);
         }
 
         .modal-content {
-            background: white;
+            background-color: white;
+            margin: 5% auto;
             padding: 30px;
             border-radius: 15px;
-            max-width: 80%;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 WinOptimizer Pro v2.0</h1>
-            <p>Comprehensive Windows System Optimization Tool - Tauri Edition</p>
+            <h1>🚀 Windows System Optimizer v2.0</h1>
+            <p>Comprehensive system optimization with enhanced bloatware detection and registry management</p>
         </div>
 
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-            <div class="tab" onclick="switchTab('cleanup')">🧹 Disk Cleanup</div>
-            <div class="tab" onclick="switchTab('bloatware')">🗑️ Bloatware Removal</div>
-            <div class="tab" onclick="switchTab('startup')">⚡ Startup Manager</div>
-            <div class="tab" onclick="switchTab('system')">🔧 System Info</div>
+            <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+            <div class="tab" onclick="showTab('registry')">🔧 Registry</div>
+            <div class="tab" onclick="showTab('files')">📁 Files</div>
+            <div class="tab" onclick="showTab('bloatware')">🗑️ Bloatware</div>
+            <div class="tab" onclick="showTab('optimization')">⚡ Optimization</div>
+            <div class="tab" onclick="showTab('backups')">💾 Backups</div>
         </div>
 
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="cpu-usage">--</div>
-                    <div class="stat-label">CPU Usage</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="cpu-progress"></div>
+            <div class="section">
+                <h3>System Information</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>OS Version</h4>
+                        <div class="value" id="os-version">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>CPU Usage</h4>
+                        <div class="value" id="cpu-usage">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Memory Usage</h4>
+                        <div class="value" id="memory-usage">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Disk Usage</h4>
+                        <div class="value" id="disk-usage">Loading...</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="memory-usage">--</div>
-                    <div class="stat-label">Memory Usage</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="memory-progress"></div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="disk-usage">--</div>
-                    <div class="stat-label">Disk Usage</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="disk-progress"></div>
-                    </div>
+                <button class="btn" onclick="refreshSystemInfo()">🔄 Refresh</button>
+            </div>
+
+            <div class="section">
+                <h3>Quick Actions</h3>
+                <button class="btn" onclick="performComprehensiveOptimization()">🚀 Full Optimization</button>
+                <button class="btn btn-warning" onclick="scanBloatware()">🔍 Scan Bloatware</button>
+                <button class="btn btn-success" onclick="scanDuplicateFiles()">📁 Find Duplicates</button>
+                <button class="btn" onclick="createRegistryBackup()">💾 Backup Registry</button>
+            </div>
+        </div>
+
+        <!-- Registry Tab -->
+        <div id="registry" class="tab-content">
+            <div class="section">
+                <h3>Registry Management</h3>
+                <button class="btn" onclick="createRegistryBackup()">💾 Create Backup</button>
+                <button class="btn btn-warning" onclick="scanRegistryOrphaned()">🔍 Scan Orphaned Entries</button>
+                <button class="btn btn-danger" onclick="cleanRegistry()">🧹 Clean Registry</button>
+            </div>
+
+            <div class="section">
+                <h3>Registry Backups</h3>
+                <div id="registry-backups-list">
+                    <p>Loading backups...</p>
                 </div>
             </div>
 
             <div class="section">
-                <h3>🎯 Quick Actions</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <button class="btn" onclick="quickScanFiles()">🔍 Quick Scan</button>
-                    <button class="btn btn-danger" onclick="quickCleanup()">🧹 Quick Cleanup</button>
-                    <button class="btn btn-success" onclick="scanBloatware()">🗑️ Remove Bloatware</button>
-                    <button class="btn" onclick="optimizeStartup()">⚡ Optimize Startup</button>
+                <h3>Registry Scan Results</h3>
+                <div id="registry-scan-results">
+                    <p>No scan results available. Run a scan to see results.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Cleanup Tab -->
-        <div id="cleanup" class="tab-content">
+        <!-- Files Tab -->
+        <div id="files" class="tab-content">
             <div class="section">
-                <h3>🧹 Disk Cleanup</h3>
-                <button class="btn" id="scan-files-btn" onclick="scanFiles()">🔍 Scan for Files</button>
-                <button class="btn btn-danger" id="cleanup-btn" onclick="cleanupFiles()" disabled>🗑️ Clean Selected Files</button>
-                
-                <div id="cleanup-stats" style="margin: 20px 0; display: none;">
-                    <p><strong>Files found:</strong> <span id="files-count">0</span></p>
-                    <p><strong>Total size:</strong> <span id="total-size">0 MB</span></p>
+                <h3>File Management</h3>
+                <button class="btn" onclick="scanTempFiles()">🔍 Scan Temp Files</button>
+                <button class="btn btn-warning" onclick="scanDuplicateFiles()">🔍 Find Duplicates</button>
+                <button class="btn btn-success" onclick="cleanTempFiles()">🧹 Clean Temp Files</button>
+            </div>
+
+            <div class="section">
+                <h3>Duplicate Files</h3>
+                <div id="duplicate-files-results">
+                    <p>No duplicate scan results available. Run a scan to see results.</p>
                 </div>
-                
-                <div id="file-list" class="file-list" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="section">
+                <h3>Temporary Files</h3>
+                <div id="temp-files-results">
+                    <p>No temp file scan results available. Run a scan to see results.</p>
+                </div>
             </div>
         </div>
 
         <!-- Bloatware Tab -->
         <div id="bloatware" class="tab-content">
             <div class="section">
-                <h3>🗑️ Bloatware Detection & Removal</h3>
-                <button class="btn" id="scan-bloatware-btn" onclick="scanBloatware()">🔍 Scan for Bloatware</button>
-                
-                <div id="bloatware-stats" style="margin: 20px 0; display: none;">
-                    <p><strong>Bloatware apps found:</strong> <span id="bloatware-count">0</span></p>
+                <h3>Bloatware Detection</h3>
+                <button class="btn btn-warning" onclick="scanBloatware()">🔍 Scan for Bloatware</button>
+                <button class="btn btn-danger" onclick="removeAllBloatware()">🗑️ Remove All Detected</button>
+            </div>
+
+            <div class="section">
+                <h3>Detected Bloatware</h3>
+                <div id="bloatware-results">
+                    <p>No bloatware scan results available. Run a scan to see results.</p>
                 </div>
-                
-                <div id="bloatware-categories" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="section">
+                <h3>Removal History</h3>
+                <div id="removal-history">
+                    <p>No removal history available.</p>
+                </div>
             </div>
         </div>
 
-        <!-- Startup Tab -->
-        <div id="startup" class="tab-content">
+        <!-- Optimization Tab -->
+        <div id="optimization" class="tab-content">
             <div class="section">
-                <h3>⚡ Startup Items Management</h3>
-                <button class="btn" id="scan-startup-btn" onclick="scanStartupItems()">🔍 Scan Startup Items</button>
-                
-                <div id="startup-list" class="file-list" style="margin-top: 20px;"></div>
+                <h3>System Optimization</h3>
+                <button class="btn" onclick="performComprehensiveOptimization()">🚀 Full Optimization</button>
+                <button class="btn btn-success" onclick="optimizeSystem()">⚡ Quick Optimization</button>
+            </div>
+
+            <div class="section">
+                <h3>Optimization Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="optimization-progress" style="width: 0%"></div>
+                </div>
+                <div id="optimization-status">Ready to optimize</div>
+            </div>
+
+            <div class="section">
+                <h3>Optimization Results</h3>
+                <div id="optimization-results">
+                    <p>No optimization results available. Run optimization to see results.</p>
+                </div>
             </div>
         </div>
 
-        <!-- System Info Tab -->
-        <div id="system" class="tab-content">
+        <!-- Backups Tab -->
+        <div id="backups" class="tab-content">
             <div class="section">
-                <h3>🔧 System Information</h3>
-                <button class="btn" onclick="refreshSystemInfo()">🔄 Refresh Info</button>
-                
-                <div class="system-info-grid" id="system-info-grid" style="margin-top: 20px;">
-                    <!-- System info will be populated here -->
+                <h3>Backup Management</h3>
+                <button class="btn" onclick="createRegistryBackup()">💾 Create Registry Backup</button>
+                <button class="btn btn-warning" onclick="listAllBackups()">📋 List All Backups</button>
+            </div>
+
+            <div class="section">
+                <h3>Available Backups</h3>
+                <div id="backups-list">
+                    <p>Loading backups...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
-
-    <!-- Modals -->
-    <div id="app-modal" class="modal">
+    <!-- Modal for confirmations -->
+    <div id="confirmationModal" class="modal">
         <div class="modal-content">
-            <h3 id="modal-title">App Details</h3>
-            <div id="modal-content"></div>
-            <div style="margin-top: 20px; text-align: right;">
-                <button class="btn" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-danger" id="uninstall-btn" onclick="uninstallApp()">Uninstall</button>
-            </div>
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title">Confirmation</h3>
+            <p id="modal-message">Are you sure you want to proceed?</p>
+            <button class="btn" onclick="confirmAction()">Yes, Proceed</button>
+            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <script>
-        // FIXED BUG #1: Removed all console.log statements for production
-        // FIXED BUG #2: Improved error handling throughout
-        // FIXED BUG #3: Better async operation management
+        // Global variables
+        let currentAction = null;
+        let systemInfo = null;
 
-        // Tauri API integration
-        const { invoke } = window.__TAURI__.core;
-
-        // Global state
-        let currentFiles = [];
-        let currentBloatware = {};
-        let currentStartupItems = [];
-        let currentApp = null;
-
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', async () => {
-            await refreshSystemStats();
-            await refreshSystemInfo();
-            
-            // Set up periodic stats refresh
-            setInterval(refreshSystemStats, 10000); // Every 10 seconds
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshSystemInfo();
+            listRegistryBackups();
         });
 
-        // Tab switching
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
 
-            // Show selected tab
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
             document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
             event.target.classList.add('active');
         }
 
-        // System stats functions
-        async function refreshSystemStats() {
-            try {
-                const stats = await invoke('get_system_stats');
-                
-                document.getElementById('cpu-usage').textContent = `${stats.cpu_usage.toFixed(1)}%`;
-                document.getElementById('memory-usage').textContent = `${stats.memory_usage.toFixed(1)}%`;
-                document.getElementById('disk-usage').textContent = `${stats.disk_usage.toFixed(1)}%`;
-                
-                document.getElementById('cpu-progress').style.width = `${stats.cpu_usage}%`;
-                document.getElementById('memory-progress').style.width = `${stats.memory_usage}%`;
-                document.getElementById('disk-progress').style.width = `${stats.disk_usage}%`;
-            } catch (error) {
-                showNotification(`Error getting system stats: ${error}`, 'error');
-            }
-        }
-
+        // System Information
         async function refreshSystemInfo() {
             try {
-                const info = await invoke('get_system_info');
-                const grid = document.getElementById('system-info-grid');
+                const info = await window.__TAURI__.invoke('get_system_info');
+                systemInfo = info;
                 
-                grid.innerHTML = `
-                    <div class="section">
-                        <h4>System</h4>
-                        <div class="info-item">
-                            <span class="info-label">Operating System:</span>
-                            <span class="info-value">${info.os}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Processor:</span>
-                            <span class="info-value">${info.processor}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Memory:</span>
-                            <span class="info-value">${info.memory}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Uptime:</span>
-                            <span class="info-value">${info.uptime}</span>
-                        </div>
-                    </div>
-                    <div class="section">
-                        <h4>Hardware</h4>
-                        <div class="info-item">
-                            <span class="info-label">Graphics:</span>
-                            <span class="info-value">${info.graphics}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Storage:</span>
-                            <span class="info-value">${info.storage}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Motherboard:</span>
-                            <span class="info-value">${info.motherboard}</span>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('os-version').textContent = info.os_version;
+                document.getElementById('cpu-usage').textContent = info.cpu_usage.toFixed(1) + '%';
+                document.getElementById('memory-usage').textContent = 
+                    Math.round((info.total_memory - info.free_memory) / 1024 / 1024 / 1024) + 'GB / ' +
+                    Math.round(info.total_memory / 1024 / 1024 / 1024) + 'GB';
+                document.getElementById('disk-usage').textContent = 
+                    info.disk_usage[0] ? Math.round(info.disk_usage[0].percentage) + '%' : 'N/A';
             } catch (error) {
-                showNotification(`Error getting system info: ${error}`, 'error');
+                showAlert('Error loading system information: ' + error, 'error');
             }
         }
 
-        // File scanning and cleanup
-        async function scanFiles() {
-            const btn = document.getElementById('scan-files-btn');
-            btn.disabled = true;
-            btn.textContent = '🔄 Scanning...';
-            
+        // Registry Management
+        async function createRegistryBackup() {
+            const description = prompt('Enter backup description:');
+            if (!description) return;
+
             try {
-                const files = await invoke('scan_temp_files');
-                currentFiles = files;
-                
-                displayFiles(files);
-                updateCleanupStats(files);
-                
-                document.getElementById('cleanup-btn').disabled = false;
-                showNotification(`Found ${files.length} temporary files`, 'success');
+                showAlert('Creating registry backup...', 'warning');
+                const backup = await window.__TAURI__.invoke('create_registry_backup', { description });
+                showAlert('Registry backup created successfully!', 'success');
+                listRegistryBackups();
             } catch (error) {
-                showNotification(`Error scanning files: ${error}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🔍 Scan for Files';
+                showAlert('Error creating registry backup: ' + error, 'error');
             }
         }
 
-        async function cleanupFiles() {
-            if (currentFiles.length === 0) {
-                showNotification('No files to clean up', 'error');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to delete ${currentFiles.length} files? This cannot be undone.`)) {
-                return;
-            }
-
-            const btn = document.getElementById('cleanup-btn');
-            btn.disabled = true;
-            btn.textContent = '🗑️ Cleaning...';
-            
+        async function scanRegistryOrphaned() {
             try {
-                const filePaths = currentFiles.map(file => file.path);
-                const result = await invoke('cleanup_files', { filePaths });
-                
-                if (result.success) {
-                    const freedMB = Math.round(result.bytes_freed / (1024 * 1024));
-                    showNotification(`Successfully deleted ${result.files_deleted} files, freed ${freedMB} MB`, 'success');
-                    
-                    // Refresh file list
-                    await scanFiles();
-                } else {
-                    showNotification(`Cleanup completed with errors: ${result.errors.join(', ')}`, 'error');
-                }
+                showAlert('Scanning for orphaned registry entries...', 'warning');
+                const results = await window.__TAURI__.invoke('scan_registry_orphaned_entries');
+                displayRegistryResults(results);
+                showAlert('Registry scan completed!', 'success');
             } catch (error) {
-                showNotification(`Error during cleanup: ${error}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🗑️ Clean Selected Files';
+                showAlert('Error scanning registry: ' + error, 'error');
             }
         }
 
-        function displayFiles(files) {
-            const list = document.getElementById('file-list');
-            if (files.length === 0) {
-                list.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">No files found</div>';
-                return;
+        async function listRegistryBackups() {
+            try {
+                const backups = await window.__TAURI__.invoke('list_registry_backups');
+                displayBackups(backups);
+            } catch (error) {
+                showAlert('Error loading backups: ' + error, 'error');
             }
-
-            list.innerHTML = files.map(file => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-path">${file.path}</div>
-                    </div>
-                    <div class="file-size">${formatFileSize(file.size)}</div>
-                </div>
-            `).join('');
         }
 
-        function updateCleanupStats(files) {
-            const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-            
-            document.getElementById('files-count').textContent = files.length;
-            document.getElementById('total-size').textContent = formatFileSize(totalSize);
-            document.getElementById('cleanup-stats').style.display = 'block';
+        // File Management
+        async function scanTempFiles() {
+            try {
+                showAlert('Scanning for temporary files...', 'warning');
+                const files = await window.__TAURI__.invoke('scan_temp_files');
+                displayTempFiles(files);
+                showAlert('Temp file scan completed!', 'success');
+            } catch (error) {
+                showAlert('Error scanning temp files: ' + error, 'error');
+            }
         }
 
-        // Bloatware scanning and removal
+        async function scanDuplicateFiles() {
+            const directories = ['C:\\Users', 'C:\\Program Files', 'C:\\Program Files (x86)'];
+            try {
+                showAlert('Scanning for duplicate files...', 'warning');
+                const results = await window.__TAURI__.invoke('scan_duplicate_files', { directories });
+                displayDuplicateFiles(results);
+                showAlert('Duplicate file scan completed!', 'success');
+            } catch (error) {
+                showAlert('Error scanning duplicate files: ' + error, 'error');
+            }
+        }
+
+        // Bloatware Management
         async function scanBloatware() {
-            const btn = document.getElementById('scan-bloatware-btn');
-            btn.disabled = true;
-            btn.textContent = '🔄 Scanning...';
-            
             try {
-                const bloatware = await invoke('scan_bloatware_enhanced');
-                currentBloatware = bloatware;
-                
-                displayBloatware(bloatware);
-                
-                const totalApps = Object.values(bloatware).reduce((sum, apps) => sum + apps.length, 0);
-                document.getElementById('bloatware-count').textContent = totalApps;
-                document.getElementById('bloatware-stats').style.display = 'block';
-                
-                showNotification(`Found ${totalApps} potentially unwanted applications`, 'success');
+                showAlert('Scanning for bloatware...', 'warning');
+                const results = await window.__TAURI__.invoke('scan_bloatware');
+                displayBloatwareResults(results);
+                showAlert('Bloatware scan completed!', 'success');
             } catch (error) {
-                showNotification(`Error scanning bloatware: ${error}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🔍 Scan for Bloatware';
+                showAlert('Error scanning bloatware: ' + error, 'error');
             }
         }
 
-        function displayBloatware(bloatware) {
-            const container = document.getElementById('bloatware-categories');
-            
-            container.innerHTML = Object.entries(bloatware).map(([category, apps]) => {
-                if (apps.length === 0) return '';
-                
-                const categoryNames = {
-                    'preinstalled': '🏢 Preinstalled Apps',
-                    'third_party': '📦 Third Party Software',
-                    'uwp': '🪟 Windows Store Apps',
-                    'system': '⚙️ System Components'
-                };
-                
-                return `
-                    <div class="section">
-                        <h4>${categoryNames[category] || category} (${apps.length})</h4>
-                        <div class="file-list">
-                            ${apps.map(app => `
-                                <div class="file-item" style="cursor: pointer;" onclick="showAppDetails('${app.name}', '${category}')">
-                                    <div class="file-info">
-                                        <div class="file-name">${app.name}</div>
-                                        <div class="file-path">Publisher: ${app.publisher} | Version: ${app.version}</div>
-                                    </div>
-                                    <div class="file-size">${app.can_uninstall ? '🗑️ Remove' : '🔒 System'}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+        async function uninstallBloatware(appName) {
+            if (!confirm(`Are you sure you want to uninstall ${appName}?`)) return;
 
-        function showAppDetails(appName, category) {
-            const app = currentBloatware[category]?.find(a => a.name === appName);
-            if (!app) return;
-            
-            currentApp = app;
-            
-            document.getElementById('modal-title').textContent = app.name;
-            document.getElementById('modal-content').innerHTML = `
-                <div class="info-item">
-                    <span class="info-label">Publisher:</span>
-                    <span class="info-value">${app.publisher}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Version:</span>
-                    <span class="info-value">${app.version}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Install Date:</span>
-                    <span class="info-value">${app.install_date}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Location:</span>
-                    <span class="info-value">${app.location}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Type:</span>
-                    <span class="info-value">${app.is_uwp ? 'UWP/Store App' : 'Win32 Application'}</span>
-                </div>
-            `;
-            
-            document.getElementById('uninstall-btn').style.display = app.can_uninstall ? 'inline-block' : 'none';
-            document.getElementById('app-modal').classList.add('show');
-        }
-
-        async function uninstallApp() {
-            if (!currentApp) return;
-            
-            if (!confirm(`Are you sure you want to uninstall "${currentApp.name}"? This cannot be undone.`)) {
-                return;
-            }
-            
-            const btn = document.getElementById('uninstall-btn');
-            btn.disabled = true;
-            btn.textContent = 'Uninstalling...';
-            
             try {
-                const result = await invoke('uninstall_program_enhanced', { programName: currentApp.name });
-                
+                showAlert(`Uninstalling ${appName}...`, 'warning');
+                const result = await window.__TAURI__.invoke('uninstall_bloatware', { appName });
                 if (result.success) {
-                    showNotification(`Successfully uninstalled ${currentApp.name} using ${result.method_used}`, 'success');
-                    closeModal();
-                    // Refresh bloatware list
-                    await scanBloatware();
+                    showAlert(`${appName} uninstalled successfully!`, 'success');
+                    scanBloatware(); // Refresh the list
                 } else {
-                    showNotification(`Failed to uninstall: ${result.message}`, 'error');
+                    showAlert(`Failed to uninstall ${appName}: ${result.errors.join(', ')}`, 'error');
                 }
             } catch (error) {
-                showNotification(`Error uninstalling: ${error}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Uninstall';
+                showAlert('Error uninstalling bloatware: ' + error, 'error');
             }
         }
 
-        // Startup management
-        async function scanStartupItems() {
-            const btn = document.getElementById('scan-startup-btn');
-            btn.disabled = true;
-            btn.textContent = '🔄 Scanning...';
-            
+        // Optimization
+        async function performComprehensiveOptimization() {
+            if (!confirm('This will perform a comprehensive system optimization. Continue?')) return;
+
             try {
-                const items = await invoke('get_startup_items');
-                currentStartupItems = items;
+                showAlert('Starting comprehensive optimization...', 'warning');
+                updateOptimizationProgress(0, 'Initializing...');
                 
-                displayStartupItems(items);
-                showNotification(`Found ${items.length} startup items`, 'success');
+                const result = await window.__TAURI__.invoke('perform_comprehensive_optimization', {
+                    includeRegistryCleanup: true,
+                    includeFileCleanup: true,
+                    includeBloatwareRemoval: true,
+                    createBackups: true
+                });
+
+                updateOptimizationProgress(100, 'Optimization completed!');
+                displayOptimizationResults(result);
+                
+                if (result.success) {
+                    showAlert(`Optimization completed! Freed ${result.space_freed_mb}MB of space.`, 'success');
+                } else {
+                    showAlert('Optimization completed with errors. Check results for details.', 'warning');
+                }
             } catch (error) {
-                showNotification(`Error scanning startup items: ${error}`, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🔍 Scan Startup Items';
+                showAlert('Error during optimization: ' + error, 'error');
             }
         }
 
-        function displayStartupItems(items) {
-            const list = document.getElementById('startup-list');
-            if (items.length === 0) {
-                list.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">No startup items found</div>';
+        async function optimizeSystem() {
+            try {
+                showAlert('Performing quick optimization...', 'warning');
+                const result = await window.__TAURI__.invoke('optimize_system');
+                displayOptimizationResults(result);
+                showAlert('Quick optimization completed!', 'success');
+            } catch (error) {
+                showAlert('Error during optimization: ' + error, 'error');
+            }
+        }
+
+        // Display functions
+        function displayRegistryResults(results) {
+            const container = document.getElementById('registry-scan-results');
+            container.innerHTML = `
+                <h4>Scan Results</h4>
+                <p>Total keys scanned: ${results.total_keys_scanned}</p>
+                <p>Orphaned keys: ${results.orphaned_keys.length}</p>
+                <p>Bloatware keys: ${results.bloatware_keys.length}</p>
+                <p>Dangerous keys: ${results.dangerous_keys.length}</p>
+                <p>Scan duration: ${results.scan_duration_ms}ms</p>
+            `;
+        }
+
+        function displayBackups(backups) {
+            const container = document.getElementById('registry-backups-list');
+            if (backups.length === 0) {
+                container.innerHTML = '<p>No backups available.</p>';
                 return;
             }
 
-            list.innerHTML = items.map(item => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-name">${item.name}</div>
-                        <div class="file-path">${item.location} | ${item.command}</div>
+            container.innerHTML = backups.map(backup => `
+                <div class="list-item">
+                    <div class="info">
+                        <strong>${backup.description}</strong><br>
+                        <small>Created: ${new Date(backup.timestamp).toLocaleString()}</small><br>
+                        <small>Size: ${Math.round(backup.file_size / 1024 / 1024)}MB</small>
                     </div>
-                    <div class="file-size">${item.enabled ? '✅ Enabled' : '❌ Disabled'}</div>
+                    <div class="actions">
+                        <button class="btn btn-success" onclick="restoreBackup('${backup.id}')">Restore</button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // Quick actions
-        async function quickScanFiles() {
-            switchTab('cleanup');
-            await scanFiles();
-        }
-
-        async function quickCleanup() {
-            await quickScanFiles();
-            if (currentFiles.length > 0) {
-                await cleanupFiles();
+        function displayTempFiles(files) {
+            const container = document.getElementById('temp-files-results');
+            if (files.length === 0) {
+                container.innerHTML = '<p>No temporary files found.</p>';
+                return;
             }
+
+            const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+            container.innerHTML = `
+                <h4>Found ${files.length} temporary files</h4>
+                <p>Total size: ${Math.round(totalSize / 1024 / 1024)}MB</p>
+                <button class="btn btn-success" onclick="cleanTempFiles()">Clean All</button>
+            `;
         }
 
-        async function optimizeStartup() {
-            switchTab('startup');
-            await scanStartupItems();
+        function displayDuplicateFiles(results) {
+            const container = document.getElementById('duplicate-files-results');
+            if (results.duplicate_groups.length === 0) {
+                container.innerHTML = '<p>No duplicate files found.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <h4>Found ${results.duplicate_groups.length} duplicate groups</h4>
+                <p>Potential savings: ${Math.round(results.duplicate_groups.reduce((sum, group) => sum + group.potential_savings, 0) / 1024 / 1024)}MB</p>
+                <button class="btn btn-success" onclick="cleanDuplicateFiles()">Clean Duplicates</button>
+            `;
+        }
+
+        function displayBloatwareResults(results) {
+            const container = document.getElementById('bloatware-results');
+            if (results.bloatware_found.length === 0) {
+                container.innerHTML = '<p>No bloatware detected.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <h4>Found ${results.bloatware_found.length} bloatware applications</h4>
+                <p>Potential savings: ${results.potential_savings_mb}MB</p>
+                ${results.bloatware_found.map(app => `
+                    <div class="list-item">
+                        <div class="info">
+                            <strong>${app.name}</strong><br>
+                            <small>Category: ${app.category}</small><br>
+                            <small>Size: ${app.size_mb}MB</small><br>
+                            <small>Confidence: ${Math.round(app.confidence_score * 100)}%</small>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="uninstallBloatware('${app.name}')">Remove</button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function displayOptimizationResults(result) {
+            const container = document.getElementById('optimization-results');
+            container.innerHTML = `
+                <h4>Optimization Results</h4>
+                <p><strong>Status:</strong> ${result.success ? 'Success' : 'Completed with errors'}</p>
+                <p><strong>Message:</strong> ${result.message}</p>
+                <p><strong>Space freed:</strong> ${result.space_freed_mb}MB</p>
+                <p><strong>Files removed:</strong> ${result.files_removed}</p>
+                <p><strong>Registry entries cleaned:</strong> ${result.registry_entries_cleaned}</p>
+                <p><strong>Bloatware removed:</strong> ${result.bloatware_removed}</p>
+                ${result.details.length > 0 ? `<h5>Details:</h5><ul>${result.details.map(detail => `<li>${detail}</li>`).join('')}</ul>` : ''}
+                ${result.errors.length > 0 ? `<h5>Errors:</h5><ul>${result.errors.map(error => `<li>${error}</li>`).join('')}</ul>` : ''}
+            `;
         }
 
         // Utility functions
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
             
             setTimeout(() => {
-                notification.classList.remove('show');
+                alertDiv.remove();
             }, 5000);
         }
 
-        function closeModal() {
-            document.getElementById('app-modal').classList.remove('show');
-            currentApp = null;
+        function updateOptimizationProgress(percentage, status) {
+            document.getElementById('optimization-progress').style.width = percentage + '%';
+            document.getElementById('optimization-status').textContent = status;
         }
 
-        // Performance optimization: Only load when needed
-        window.addEventListener('load', () => {
-            // Additional initialization if needed
-        });
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        function confirmAction() {
+            if (currentAction) {
+                currentAction();
+            }
+            closeModal();
+        }
+
+        // Additional functions for cleanup operations
+        async function cleanTempFiles() {
+            try {
+                const files = await window.__TAURI__.invoke('scan_temp_files');
+                const result = await window.__TAURI__.invoke('cleanup_temp_files', { files });
+                showAlert(`Cleaned ${result.files_removed} temp files, freed ${Math.round(result.space_freed / 1024 / 1024)}MB`, 'success');
+                scanTempFiles(); // Refresh the list
+            } catch (error) {
+                showAlert('Error cleaning temp files: ' + error, 'error');
+            }
+        }
+
+        async function cleanDuplicateFiles() {
+            // This would require the duplicate scan results to be stored globally
+            showAlert('Duplicate file cleanup not implemented in this demo', 'warning');
+        }
+
+        async function restoreBackup(backupId) {
+            if (!confirm('Are you sure you want to restore this backup? This will overwrite current registry settings.')) return;
+
+            try {
+                showAlert('Restoring registry backup...', 'warning');
+                await window.__TAURI__.invoke('restore_registry_backup', { backupId });
+                showAlert('Registry backup restored successfully!', 'success');
+            } catch (error) {
+                showAlert('Error restoring backup: ' + error, 'error');
+            }
+        }
     </script>
 </body>
 </html>
