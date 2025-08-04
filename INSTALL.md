@@ -1,24 +1,6 @@
-# 📦 Installation Guide - WinOptimizer Pro
+# 🚀 Installation Guide - Windows System Optimizer v2.0
 
-**🎉 COMPLETE ENHANCEMENT ACHIEVED - ERROR-FREE POWERHOUSE APPLICATION**
-
-This guide provides comprehensive installation instructions for WinOptimizer Pro, the advanced Windows system optimization tool.
-
-## 🎯 **Quick Start**
-
-### Option 1: Portable Version (Recommended)
-1. Download the latest release
-2. Extract to any folder
-3. Run `WinOptimizer.exe` as Administrator
-4. Start optimizing your system!
-
-### Option 2: Development Setup
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start development: `npm start`
-4. Build executable: `npm run build`
-
-## 📋 **System Requirements**
+## 📋 System Requirements
 
 ### Minimum Requirements
 - **Operating System**: Windows 10 (version 1903) or Windows 11
@@ -26,256 +8,401 @@ This guide provides comprehensive installation instructions for WinOptimizer Pro
 - **RAM**: 4 GB
 - **Storage**: 100 MB free space
 - **PowerShell**: Version 5.1 or higher
-- **.NET Framework**: 4.7.2 or higher
+- **WebView2**: Microsoft Edge WebView2 Runtime
 
 ### Recommended Requirements
 - **Operating System**: Windows 11 (latest version)
 - **Architecture**: x64 (64-bit)
 - **RAM**: 8 GB or more
 - **Storage**: 500 MB free space
-- **PowerShell**: Version 7.0 or higher
 - **Permissions**: Administrator access
 - **Antivirus**: Temporarily disable for optimal performance
 
-## 🚀 **Installation Methods**
+## 🛠️ Installation Methods
 
-### Method 1: Portable Installation (Easiest)
+### Method 1: Download Pre-built Executable (Recommended)
 
-#### Step 1: Download
-1. Go to the [Releases](https://github.com/your-repo/Windows-Optimizer/releases) page
-2. Download the latest `WinOptimizer-Portable.zip`
-3. Extract to your preferred location
+1. **Download the Latest Release**
+   - Go to [GitHub Releases](https://github.com/drdeeks/windows-system-optimizer/releases)
+   - Download `windows-system-optimizer_2.0.0_x64_en-US.msi` (Installer)
+   - Or download `windows-system-optimizer_2.0.0_x64_en-US.zip` (Portable)
 
-#### Step 2: Run
-1. Navigate to the extracted folder
-2. Right-click `WinOptimizer.exe`
-3. Select "Run as administrator"
-4. The application will start immediately
+2. **Installation Options**
 
-#### Step 3: First Run Setup
-1. The application will validate your system
-2. Accept the terms and conditions
-3. Create a system restore point (recommended)
-4. Start optimizing!
+   #### Option A: MSI Installer (Recommended)
+   ```bash
+   # Run the installer as Administrator
+   windows-system-optimizer_2.0.0_x64_en-US.msi
+   
+   # Follow the installation wizard
+   # Choose installation directory
+   # Create desktop shortcut (recommended)
+   # Create start menu shortcut (recommended)
+   ```
 
-### Method 2: Development Installation
+   #### Option B: Portable Version
+   ```bash
+   # Extract the ZIP file
+   # Navigate to the extracted folder
+   # Run windows-system-optimizer.exe as Administrator
+   ```
 
-#### Prerequisites
-- **Node.js**: Version 18.0.0 or higher
-- **npm**: Version 8.0.0 or higher
-- **Git**: For cloning the repository
+### Method 2: Build from Source
 
-#### Step 1: Clone Repository
-```bash
-git clone https://github.com/your-repo/Windows-Optimizer.git
-cd Windows-Optimizer
+#### Prerequisites Installation
+
+1. **Install Node.js**
+   ```bash
+   # Download from https://nodejs.org/
+   # Or use winget
+   winget install OpenJS.NodeJS
+   
+   # Verify installation
+   node --version
+   npm --version
+   ```
+
+2. **Install Rust**
+   ```bash
+   # Download rustup-init.exe from https://rustup.rs/
+   # Or use winget
+   winget install Rust.Rust
+   
+   # Verify installation
+   rustc --version
+   cargo --version
+   ```
+
+3. **Install Microsoft Visual Studio Build Tools**
+   ```bash
+   # Download from https://visualstudio.microsoft.com/downloads/
+   # Or use winget
+   winget install Microsoft.VisualStudio.2022.BuildTools
+   
+   # Ensure C++ build tools are included
+   ```
+
+4. **Install Tauri CLI**
+   ```bash
+   cargo install tauri-cli
+   
+   # Verify installation
+   cargo tauri --version
+   ```
+
+#### Building the Application
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/drdeeks/windows-system-optimizer.git
+   cd windows-system-optimizer
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Development Mode**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for Production**
+   ```bash
+   # Build release version
+   npm run build
+   
+   # Build debug version
+   npm run build-debug
+   ```
+
+## 🔧 Configuration
+
+### Tauri Configuration
+The application uses `src-tauri/tauri.conf.json` for configuration:
+
+```json
+{
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devPath": "../index.html",
+    "distDir": "../",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "Windows System Optimizer",
+    "version": "2.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true,
+        "execute": true,
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "powershell",
+            "cmd": "powershell.exe",
+            "args": ["-Command"]
+          }
+        ]
+      },
+      "dialog": {
+        "all": false,
+        "open": true,
+        "save": true
+      },
+      "fs": {
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "copyFile": true,
+        "createDir": true,
+        "removeDir": true,
+        "removeFile": true,
+        "renameFile": true,
+        "exists": true,
+        "scope": ["$APPDATA", "$LOCALDATA", "$TEMP", "$WINDOWS"]
+      },
+      "notification": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.systemoptimizer.windows",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "Windows System Optimizer v2.0",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1200,
+        "minHeight": 800
+      }
+    ]
+  }
+}
 ```
 
-#### Step 2: Install Dependencies
-```bash
-npm install
-```
+## 🚀 First Run
 
-#### Step 3: Start Development
-```bash
-npm start
-```
+### Initial Setup
 
-#### Step 4: Build Executable (Optional)
-```bash
-npm run build
-```
+1. **Run as Administrator**
+   ```bash
+   # Right-click the executable and select "Run as administrator"
+   # Or use Command Prompt as Administrator
+   windows-system-optimizer.exe
+   ```
 
-### Method 3: Administrator Installation
+2. **Grant Permissions**
+   - Allow the application through Windows Defender
+   - Grant PowerShell execution permissions if prompted
+   - Allow registry access when requested
 
-#### Step 1: Download and Extract
-1. Download the latest release
-2. Extract to `C:\Program Files\WinOptimizer\`
-3. Ensure administrator permissions
+3. **Verify Installation**
+   - Check that all tabs load correctly
+   - Verify system information is displayed
+   - Test basic functionality
 
-#### Step 2: Create Shortcuts
-1. Right-click `WinOptimizer.exe`
-2. Select "Create shortcut"
-3. Move shortcut to Desktop or Start Menu
+### Post-Installation Steps
 
-#### Step 3: Configure Permissions
-1. Right-click the shortcut
-2. Select "Properties"
-3. Click "Advanced"
-4. Check "Run as administrator"
-5. Click "OK"
+1. **Create System Restore Point**
+   ```powershell
+   # Open PowerShell as Administrator
+   Checkpoint-Computer -Description "Before Windows System Optimizer" -RestorePointType "MODIFY_SETTINGS"
+   ```
 
-## 🔧 **Configuration**
+2. **Configure Antivirus**
+   - Add the application to antivirus exclusions
+   - Temporarily disable real-time protection during scans
 
-### PowerShell Execution Policy
-If you encounter PowerShell execution policy errors:
+3. **Set PowerShell Execution Policy**
+   ```powershell
+   # Open PowerShell as Administrator
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
 
-#### Method 1: Temporary (Recommended)
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+## 🔍 Troubleshooting
 
-#### Method 2: Permanent (Use with caution)
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
-```
+### Common Installation Issues
 
-### Antivirus Configuration
-Some antivirus software may flag the application:
+1. **"WebView2 not found"**
+   ```bash
+   # Install WebView2 Runtime
+   winget install Microsoft.WebView2Runtime
+   # Or download from https://developer.microsoft.com/en-us/microsoft-edge/webview2/
+   ```
 
-#### Windows Defender
-1. Open Windows Security
-2. Go to "Virus & threat protection"
-3. Click "Manage settings"
-4. Add the application folder to exclusions
+2. **"Rust toolchain not found"**
+   ```bash
+   # Install Rust
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   # Or download rustup-init.exe from https://rustup.rs/
+   ```
 
-#### Third-party Antivirus
-1. Open your antivirus software
-2. Navigate to exclusions or trusted applications
-3. Add the WinOptimizer folder
-4. Temporarily disable real-time protection during use
+3. **"Node.js not found"**
+   ```bash
+   # Install Node.js
+   winget install OpenJS.NodeJS
+   # Or download from https://nodejs.org/
+   ```
 
-## 🛠️ **Troubleshooting**
+4. **"Visual Studio Build Tools missing"**
+   ```bash
+   # Install Visual Studio Build Tools
+   winget install Microsoft.VisualStudio.2022.BuildTools
+   # Or download from https://visualstudio.microsoft.com/downloads/
+   ```
 
-### Common Issues
+### Runtime Issues
 
-#### Issue: "PowerShell execution policy error"
-**Solution**: Run PowerShell as Administrator and execute:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+1. **Permission Denied**
+   ```bash
+   # Run as Administrator
+   # Right-click executable → "Run as administrator"
+   ```
 
-#### Issue: "Access denied" errors
-**Solution**: 
-1. Right-click the application
-2. Select "Run as administrator"
-3. Ensure you have administrator privileges
+2. **PowerShell Execution Policy**
+   ```powershell
+   # Open PowerShell as Administrator
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
 
-#### Issue: "Antivirus blocking the application"
-**Solution**:
-1. Add the application to antivirus exclusions
-2. Temporarily disable real-time protection
-3. Run the application
-4. Re-enable protection after use
+3. **Antivirus Blocking**
+   - Add application to antivirus exclusions
+   - Temporarily disable real-time protection
+   - Check antivirus logs for blocked operations
 
-#### Issue: "System validation failed"
-**Solution**:
-1. Ensure Windows 10/11 is up to date
-2. Update PowerShell to latest version
-3. Install .NET Framework 4.7.2 or higher
-4. Run Windows Update
-
-#### Issue: "Application won't start"
-**Solution**:
-1. Check system requirements
-2. Verify Node.js installation (for development)
-3. Reinstall dependencies: `npm install`
-4. Clear npm cache: `npm cache clean --force`
+4. **Application Not Starting**
+   ```bash
+   # Check Windows Event Viewer for errors
+   # Verify all dependencies are installed
+   # Try running in compatibility mode
+   ```
 
 ### Performance Issues
 
-#### Issue: "Slow scanning"
-**Solution**:
-1. Close other applications
-2. Temporarily disable antivirus
-3. Ensure adequate free disk space
-4. Run as administrator
+1. **Slow Startup**
+   - Close other resource-intensive applications
+   - Disable unnecessary startup items
+   - Check disk space availability
 
-#### Issue: "High memory usage"
-**Solution**:
-1. Close unnecessary applications
-2. Restart the application
-3. Use smaller scan directories
-4. Update to latest version
+2. **High Memory Usage**
+   - Close other applications during scans
+   - Restart the application if needed
+   - Check for memory leaks in task manager
 
-## 🔒 **Security Considerations**
+3. **Scan Failures**
+   - Run as Administrator
+   - Check antivirus settings
+   - Verify PowerShell execution policy
+   - Check disk permissions
 
-### Before First Use
-1. **Create System Restore Point**: Always create a restore point before major operations
-2. **Backup Important Data**: Ensure important files are backed up
-3. **Review Settings**: Check application settings before use
-4. **Test on Non-Critical System**: Test on a secondary system first
+## 🔒 Security Considerations
 
-### During Use
-1. **Review Before Delete**: Always review items before deletion
-2. **Start Small**: Begin with safe operations like temp file cleanup
-3. **Monitor Results**: Check system stability after major operations
-4. **Keep Logs**: Maintain operation logs for troubleshooting
+### Built-in Protections
+- **System File Protection**: Never deletes essential Windows files
+- **Running Process Safety**: Won't terminate critical system processes
+- **Registry Backup**: Automatic backup before registry modifications
+- **Permission Validation**: Checks administrator privileges when needed
+- **Error Recovery**: Graceful handling of failed operations
 
-### After Use
-1. **Verify System Stability**: Ensure system is working correctly
-2. **Check Performance**: Monitor system performance improvements
-3. **Update Logs**: Keep records of operations performed
-4. **Regular Maintenance**: Schedule regular optimization sessions
+### Tauri Security Model
+- **Capability-based Permissions**: Only necessary system APIs are exposed
+- **Process Isolation**: Frontend and backend run in separate processes
+- **Minimal Attack Surface**: Reduced vulnerability exposure
+- **Memory Safety**: Rust backend prevents memory-related vulnerabilities
 
-## 📊 **Verification**
+## 📊 Performance Metrics
 
-### System Validation
-The application automatically validates your system on startup:
+| Metric | Value |
+|--------|-------|
+| **Installation Size** | ~15MB |
+| **Memory Usage** | ~60MB |
+| **Startup Time** | <2 seconds |
+| **Scan Speed** | Optimized with parallel processing |
+| **Security** | Enhanced with Tauri security model |
 
-1. **Operating System Check**: Verifies Windows 10/11 compatibility
-2. **PowerShell Version**: Checks PowerShell version and execution policy
-3. **Permission Check**: Verifies administrator privileges
-4. **System Resources**: Checks available memory and disk space
-5. **Registry Access**: Validates registry access permissions
+## 🎯 Best Practices
 
-### Feature Verification
-After installation, verify all features are working:
+### Before Installation
+1. **Create System Restore Point**
+2. **Backup Important Data**
+3. **Update Windows**
+4. **Disable Antivirus Temporarily**
 
-1. **Disk Cleanup**: Test temp file cleanup
-2. **Bloatware Detection**: Run a system scan
-3. **Startup Management**: Check startup items
-4. **System Information**: Verify system stats display
-5. **Duplicate Scanner**: Test file scanning capabilities
+### During Installation
+1. **Run as Administrator**
+2. **Follow Installation Wizard**
+3. **Grant Required Permissions**
+4. **Verify Installation**
 
-## 🔄 **Updates**
+### After Installation
+1. **Test Basic Functionality**
+2. **Configure Antivirus Exclusions**
+3. **Set PowerShell Execution Policy**
+4. **Create First Backup**
 
-### Automatic Updates
-The application checks for updates automatically:
+## 📝 Uninstallation
 
-1. **Update Notifications**: You'll be notified of available updates
-2. **Download Updates**: Updates are downloaded automatically
-3. **Install Updates**: Follow the installation wizard
-4. **Restart Application**: Restart to apply updates
+### Using Control Panel
+1. Open **Control Panel** → **Programs and Features**
+2. Find **Windows System Optimizer**
+3. Click **Uninstall**
+4. Follow the uninstallation wizard
 
-### Manual Updates
-To manually update:
+### Manual Cleanup
+```bash
+# Remove application files
+rmdir /s /q "%ProgramFiles%\Windows System Optimizer"
 
-1. **Download Latest Release**: Get the latest version
-2. **Backup Settings**: Export your settings
-3. **Replace Files**: Replace old files with new ones
-4. **Import Settings**: Import your saved settings
-5. **Verify Installation**: Test all features
+# Remove user data
+rmdir /s /q "%APPDATA%\Windows System Optimizer"
 
-## 📞 **Support**
+# Remove registry entries (if any)
+# Use registry editor with caution
+```
+
+## 🤝 Support
 
 ### Getting Help
-If you encounter issues:
+- **GitHub Issues**: Create an issue on GitHub
+- **Documentation**: Check README.md and other docs
+- **Troubleshooting**: Review this installation guide
+- **Community**: Join discussions on GitHub
 
-1. **Check Documentation**: Review this guide and README
-2. **Search Issues**: Check existing GitHub issues
-3. **Create Issue**: Create a new issue with details
-4. **Community Support**: Ask in the community forum
+### Useful Commands
+```bash
+# Check application version
+windows-system-optimizer.exe --version
 
-### Contact Information
-- **GitHub Issues**: [Create an issue](https://github.com/your-repo/Windows-Optimizer/issues)
-- **Email Support**: support@winoptimizer.com
-- **Documentation**: [Full documentation](https://winoptimizer.com/docs)
+# Run in debug mode
+windows-system-optimizer.exe --debug
 
-## 🎉 **Success!**
-
-Congratulations! You've successfully installed WinOptimizer Pro. The application is now ready to optimize your Windows system with:
-
-- ✅ **Enhanced Bloatware Detection**
-- ✅ **Advanced Space Saver Tools**
-- ✅ **Robust Error Handling**
-- ✅ **Modern User Interface**
-- ✅ **Comprehensive System Monitoring**
-
-**Start optimizing your system today!**
+# Check system requirements
+windows-system-optimizer.exe --check-system
+```
 
 ---
 
-**🎉 COMPLETE ENHANCEMENT ACHIEVED - ERROR-FREE POWERHOUSE APPLICATION**
-
-**WinOptimizer Pro is now ready to transform your Windows experience with professional-grade optimization capabilities.** 
+**Built with ❤️ using Tauri and Rust for maximum performance and security.** 

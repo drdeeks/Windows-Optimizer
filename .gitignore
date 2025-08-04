@@ -10,7 +10,9 @@ build/
 out/
 Windows-System-Optimizer-Portable/
 
-# Electron build outputs
+# Tauri build outputs
+src-tauri/target/
+src-tauri/Cargo.lock
 *.exe
 *.msi
 *.dmg
@@ -43,9 +45,9 @@ Windows-System-Optimizer-Portable/
 ehthumbs.db
 Thumbs.db
 
-# Electron specific
+# Tauri specific
 *.log
-electron-builder.yml
+tauri.conf.json
 app/
 resources/
 
@@ -159,15 +161,13 @@ uploads/
 # Documentation files
 CHANGELOG.md
 
-# Chromium/Electron runtime files
-chrome_*.pak
-*.dll
-*.dat
-locales/
-resources.pak
-snapshot_blob.bin
-v8_context_snapshot.bin
-version
-*.json
-!package*.json
-!.gitignore 
+# Rust specific
+target/
+Cargo.lock
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.a
+*.so
+*.dylib 
